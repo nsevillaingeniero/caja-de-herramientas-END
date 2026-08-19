@@ -1,0 +1,23 @@
+{
+  "name": "Kahoot!",
+  "shortDescription": "Concursos de preguntas en vivo que despiertan al grupo y sirven para repasar antes de un parcial.",
+  "description": "Kahoot! convierte un cuestionario en un concurso proyectado en pantalla: tú muestras la pregunta, los estudiantes responden desde su celular y el marcador se actualiza en tiempo real.\n\nFunciona especialmente bien como activador al inicio de clase o como repaso antes de una evaluación. No requiere que los estudiantes tengan cuenta: entran con un PIN. Su límite está en el plan gratuito, que restringe el número de participantes y algunos tipos de pregunta.",
+  "activities": [
+    "Concursos de preguntas en vivo",
+    "Repasos gamificados antes de evaluaciones",
+    "Diagnósticos rápidos de conocimientos previos",
+    "Tareas asincrónicas con fecha límite"
+  ],
+  "modality": "web",
+  "pricing": "freemium",
+  "pricingNote": "El plan gratuito cubre lo esencial. Los planes de pago amplían participantes y tipos de pregunta.",
+  "categories": ["actividades-interactivas", "evaluacion", "encuestas-y-votaciones"],
+  "moodleIntegration": "enlace",
+  "moodleUsage": "Comparte el enlace del reto desde un recurso «URL» en tu curso, o proyéctalo en clase presencial. Los resultados se descargan en Excel desde Kahoot! y se cargan manualmente si quieres registrarlos.",
+  "languages": ["Español", "Inglés"],
+  "url": "https://kahoot.com",
+  "intents": ["crear-actividad", "evaluar", "promover-participacion"],
+  "tags": ["gamificación", "concurso", "repaso", "participación", "cuestionario"],
+  "featured": false,
+  "order": 4
+}

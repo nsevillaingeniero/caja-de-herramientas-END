@@ -1,0 +1,288 @@
+---
+import Icon from '../primitives/Icon.astro';
+import ResourceCard from './ResourceCard.astro';
+import {
+  MODALITY_LABELS,
+  MOODLE_LABELS,
+  PRICING_LABELS,
+  type Category,
+  type Resource,
+} from '../../lib/content';
+
+/**
+ * Catálogo con filtros.
+ *
+ * Los filtros son casillas reales —navegables con teclado y
+ * anunciadas por el lector de pantalla— presentadas como fichas: el
+ * panel lateral de casillas anterior hacía que el catálogo se leyera
+ * como un panel de administración.
+ *
+ * Todas las tarjetas se renderizan en el servidor y el filtrado solo
+ * las oculta, así que el catálogo sigue siendo indexable y utilizable
+ * aunque el JavaScript falle.
+ */
+interface Props {
+  resources: Resource[];
+  categories: Category[];
+  /** Categoría preseleccionada (para /recursos/categoria/[id]). */
+  activeCategory?: string;
+}
+
+const { resources, categories, activeCategory } = Astro.props;
+
+const usedCategories = categories
+  .map((category) => ({
+    category,
+    count: resources.filter((resource) =>
+      resource.data.categories.some((ref) => ref.id === category.id),
+    ).length,
+  }))
+  .filter((entry) => entry.count > 0);
+
+const pricingOptions = [...new Set(resources.map((r) => r.data.pricing))];
+const modalityOptions = [...new Set(resources.map((r) => r.data.modality))];
+const moodleOptions = [
+  ...new Set(resources.map((r) => r.data.moodleIntegration)),
+];
+
+/** Estilo compartido de ficha: la casilla real queda oculta debajo. */
+const chip =
+  'group inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200 ' +
+  'text-ink-soft ring-1 ring-inset ring-border-strong hover:ring-end-600 hover:text-end-800 ' +
+  'has-[:checked]:bg-end-700 has-[:checked]:text-white has-[:checked]:ring-end-700 ' +
+  'has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-teal-500';
+---
+
+<div>
+  <!-- Navegación por categoría: la vía principal de exploración. -->
+  <fieldset>
+    <legend class="eyebrow text-ink-muted">Explora por categoría</legend>
+
+    <div class="mt-4 flex flex-wrap gap-2.5">
+      {
+        usedCategories.map(({ category, count }) => (
+          <label class={chip}>
+            <input
+              type="checkbox"
+              name="categoria"
+              value={category.id}
+              checked={activeCategory === category.id}
+              class="sr-only"
+            />
+            <Icon name={category.data.icon} class="size-4 shrink-0 opacity-70" />
+            {category.data.name}
+            <span class="tabular text-xs opacity-60">{count}</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <!-- Filtros secundarios: plegados hasta que hagan falta. -->
+  <details data-filter-panel class="group mt-8 border-y border-border">
+    <summary
+      class="flex cursor-pointer list-none items-center gap-2.5 py-4 font-semibold text-end-900"
+    >
+      <Icon name="filter" class="size-4" />
+      Afinar por precio, modalidad o integración
+      <span
+        data-filter-count
+        class="tabular hidden rounded-full bg-end-700 px-2 py-0.5 text-xs font-bold text-white"></span>
+      <Icon
+        name="chevron-down"
+        class="ml-auto size-4 text-ink-muted transition-transform duration-300 group-open:rotate-180"
+      />
+    </summary>
+
+    <div class="grid gap-8 pt-2 pb-7 sm:grid-cols-3">
+      <fieldset>
+        <legend class="eyebrow text-ink-muted">Precio</legend>
+        <div class="mt-3.5 flex flex-wrap gap-2">
+          {
+            pricingOptions.map((option) => (
+              <label class={chip}>
+                <input type="checkbox" name="precio" value={option} class="sr-only" />
+                {PRICING_LABELS[option]}
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="eyebrow text-ink-muted">Modalidad</legend>
+        <div class="mt-3.5 flex flex-wrap gap-2">
+          {
+            modalityOptions.map((option) => (
+              <label class={chip}>
+                <input
+                  type="checkbox"
+                  name="modalidad"
+                  value={option}
+                  class="sr-only"
+                />
+                {MODALITY_LABELS[option]}
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="eyebrow text-ink-muted">En END Digital</legend>
+        <div class="mt-3.5 flex flex-wrap gap-2">
+          {
+            moodleOptions.map((option) => (
+              <label class={chip}>
+                <input type="checkbox" name="moodle" value={option} class="sr-only" />
+                {MOODLE_LABELS[option]}
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+    </div>
+  </details>
+
+  <!-- Resultados -->
+  <div class="mt-8 flex flex-wrap items-center justify-between gap-4">
+    <p class="text-sm text-ink-muted" role="status" aria-live="polite">
+      <span data-result-count class="tabular font-bold text-end-900"
+        >{resources.length}</span
+      >{' '}
+      <span data-result-noun
+        >{resources.length === 1 ? 'recurso' : 'recursos'}</span
+      >
+    </p>
+
+    <button
+      type="button"
+      data-filter-clear
+      data-clear-toolbar
+      class="hidden text-sm font-semibold text-end-700 underline underline-offset-4 hover:text-end-800"
+    >
+      Limpiar filtros
+    </button>
+  </div>
+
+  <ul data-resource-grid class="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+    {
+      resources.map((resource) => (
+        <li
+          data-resource
+          data-categories={resource.data.categories.map((c) => c.id).join(' ')}
+          data-precio={resource.data.pricing}
+          data-modalidad={resource.data.modality}
+          data-moodle={resource.data.moodleIntegration}
+          class="reveal"
+        >
+          <ResourceCard resource={resource} categories={categories} class="h-full" />
+        </li>
+      ))
+    }
+  </ul>
+
+  <div
+    data-resource-none
+    class="hidden rounded-panel bg-paper px-6 py-20 text-center"
+  >
+    <p class="font-display text-xl font-extrabold text-end-900">
+      Ningún recurso coincide
+    </p>
+    <p class="mx-auto mt-3 max-w-sm text-ink-soft">
+      Prueba quitando algún filtro para ampliar los resultados.
+    </p>
+    <button
+      type="button"
+      data-filter-clear
+      class="mt-7 rounded-control bg-end-600 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-end-700"
+    >
+      Limpiar filtros
+    </button>
+  </div>
+</div>
+
+<script>
+  const grid = document.querySelector('[data-resource-grid]');
+  const panel = document.querySelector<HTMLDetailsElement>('[data-filter-panel]');
+
+  if (grid) {
+    const items = Array.from(
+      grid.querySelectorAll<HTMLElement>('[data-resource]'),
+    );
+    const checkboxes = Array.from(
+      document.querySelectorAll<HTMLInputElement>(
+        'input[name="categoria"], input[name="precio"], input[name="modalidad"], input[name="moodle"]',
+      ),
+    );
+    const countEl = document.querySelector('[data-result-count]');
+    const nounEl = document.querySelector('[data-result-noun]');
+    const noneEl = document.querySelector('[data-resource-none]');
+    const badgeEl = document.querySelector('[data-filter-count]');
+    const clearToolbar = document.querySelector('[data-clear-toolbar]');
+
+    /** Valores marcados de un grupo de filtros. */
+    function selected(name: string): string[] {
+      return checkboxes
+        .filter((box) => box.name === name && box.checked)
+        .map((box) => box.value);
+    }
+
+    function apply() {
+      const categorias = selected('categoria');
+      const precios = selected('precio');
+      const modalidades = selected('modalidad');
+      const moodles = selected('moodle');
+
+      const secondary = precios.length + modalidades.length + moodles.length;
+      const active = categorias.length + secondary;
+
+      let visible = 0;
+
+      for (const item of items) {
+        const itemCategories = (item.dataset.categories ?? '').split(' ');
+
+        // Dentro de un grupo la lógica es OR; entre grupos, AND.
+        const matches =
+          (categorias.length === 0 ||
+            categorias.some((value) => itemCategories.includes(value))) &&
+          (precios.length === 0 || precios.includes(item.dataset.precio ?? '')) &&
+          (modalidades.length === 0 ||
+            modalidades.includes(item.dataset.modalidad ?? '')) &&
+          (moodles.length === 0 || moodles.includes(item.dataset.moodle ?? ''));
+
+        item.hidden = !matches;
+        if (matches) visible += 1;
+      }
+
+      if (countEl) countEl.textContent = String(visible);
+      if (nounEl) nounEl.textContent = visible === 1 ? 'recurso' : 'recursos';
+
+      noneEl?.classList.toggle('hidden', visible > 0);
+      (grid as HTMLElement).classList.toggle('hidden', visible === 0);
+      clearToolbar?.classList.toggle('hidden', active === 0);
+
+      if (badgeEl) {
+        badgeEl.textContent = String(secondary);
+        badgeEl.classList.toggle('hidden', secondary === 0);
+      }
+    }
+
+    checkboxes.forEach((box) => box.addEventListener('change', apply));
+
+    document.querySelectorAll('[data-filter-clear]').forEach((button) => {
+      button.addEventListener('click', () => {
+        checkboxes.forEach((box) => (box.checked = false));
+        apply();
+      });
+    });
+
+    // Si se llega con filtros secundarios activos, el panel se abre solo
+    // para que no queden invisibles.
+    if (panel && (selected('precio').length || selected('modalidad').length)) {
+      panel.open = true;
+    }
+
+    apply();
+  }
+</script>

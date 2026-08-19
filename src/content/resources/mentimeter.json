@@ -1,0 +1,24 @@
+{
+  "name": "Mentimeter",
+  "shortDescription": "Preguntas y nubes de palabras en vivo: el grupo responde desde el celular y ves el resultado proyectado.",
+  "description": "Mentimeter permite intercalar preguntas dentro de una presentación y ver las respuestas del grupo en tiempo real: nubes de palabras, escalas, opción múltiple, preguntas abiertas y rankings.\n\nEs útil cuando quieres saber qué está entendiendo el grupo antes de avanzar, o cuando necesitas que participen quienes normalmente no levantan la mano. El anonimato de las respuestas suele soltar conversaciones que de otro modo no ocurren.",
+  "activities": [
+    "Nubes de palabras colaborativas",
+    "Votaciones y escalas de opinión",
+    "Preguntas abiertas anónimas",
+    "Cuestionarios en vivo",
+    "Presentaciones con participación integrada"
+  ],
+  "modality": "web",
+  "pricing": "freemium",
+  "pricingNote": "El plan gratuito limita el número de preguntas por presentación.",
+  "categories": ["encuestas-y-votaciones", "actividades-interactivas", "comunicacion"],
+  "moodleIntegration": "embed",
+  "moodleUsage": "Comparte el enlace de participación en un recurso «URL», o incrusta la presentación en una «Página» del curso. Los resultados se exportan desde Mentimeter.",
+  "languages": ["Español", "Inglés"],
+  "url": "https://www.mentimeter.com",
+  "intents": ["promover-participacion", "evaluar"],
+  "tags": ["participación", "encuesta", "votación", "tiempo real"],
+  "featured": false,
+  "order": 5
+}

@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import TrainingPlan from '../../components/training/TrainingPlan.astro';
+import Icon from '../../components/primitives/Icon.astro';
+
+import { getTrainings } from '../../lib/content';
+
+/**
+ * Plan de capacitación digital y acompañamiento docente.
+ *
+ * Publicado en el marco de la contingencia por calamidad pública y
+ * desastre nacional. Reúne las sesiones de formación, sus horarios y
+ * —a medida que se publiquen— sus grabaciones.
+ */
+const trainings = await getTrainings();
+---
+
+<BaseLayout
+  title="Plan de capacitación"
+  description="Plan de capacitación digital y acompañamiento docente de la Escuela Nacional del Deporte: sesiones de formación en Google Workspace, Moodle y recursos educativos digitales, con sus horarios y grabaciones."
+>
+  <PageHeader
+    eyebrow="Acompañamiento docente"
+    title="Plan de capacitación digital"
+    description="Formación y acompañamiento para el profesorado en el marco de la contingencia por calamidad pública y desastre nacional."
+    accent="teal"
+    tone="deep"
+    breadcrumbs={[{ href: '/', label: 'Inicio' }]}
+  >
+    <p
+      slot="aside"
+      class="tabular shrink-0 font-display text-5xl font-extrabold text-teal-300"
+    >
+      {trainings.length}
+      <span class="mt-1 block text-sm font-semibold tracking-wide text-white/60">
+        {trainings.length === 1 ? 'sesión' : 'sesiones'}
+      </span>
+    </p>
+  </PageHeader>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-14 sm:px-8 lg:py-16">
+    {
+      trainings.length > 0 ? (
+        <TrainingPlan trainings={trainings} />
+      ) : (
+        <div class="rounded-panel bg-paper px-6 py-20 text-center">
+          <p class="font-display text-xl font-extrabold text-end-900">
+            El plan aún no tiene sesiones publicadas
+          </p>
+        </div>
+      )
+    }
+
+    {/* Cómo se añade una grabación: la sección está pensada para
+        crecer así, y conviene que quede escrito donde se ve. */}
+    <p
+      class="mt-14 flex max-w-2xl items-start gap-3 text-sm leading-relaxed text-ink-muted"
+    >
+      <Icon name="lightbulb" class="mt-0.5 size-4 shrink-0 text-clay-600" />
+      <span>
+        Para publicar la grabación de una sesión, añade su enlace en el archivo
+        de la sesión dentro de <code
+          class="rounded bg-paper px-1.5 py-0.5 text-[0.875em]"
+          >src/content/trainings/</code
+        >. La ficha pasa sola de «grabación pendiente» a mostrar el botón para
+        verla.
+      </span>
+    </p>
+  </div>
+</BaseLayout>

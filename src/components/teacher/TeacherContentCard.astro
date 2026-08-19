@@ -1,0 +1,111 @@
+---
+import Icon from '../primitives/Icon.astro';
+import {
+  CONTENT_TYPE_LABELS,
+  formatDate,
+  type TeacherContent,
+} from '../../lib/content';
+
+/**
+ * Publicación del portal institucional.
+ *
+ * Sin marco: la fotografía y la tipografía sostienen la pieza, como en
+ * un índice de prensa. Un marco alrededor de cada noticia convertía la
+ * sección en una rejilla de tarjetas idénticas.
+ */
+interface Props {
+  item: TeacherContent;
+  /** La variante destacada abre la sección con más presencia visual. */
+  featured?: boolean;
+  class?: string;
+}
+
+const { item, featured = false, class: className = '' } = Astro.props;
+const { data } = item;
+
+// Cuando el portal no publicó descripción, el resumen es el propio título:
+// mostrarlo bajo el titular lo duplicaría, así que se omite.
+const showExcerpt = data.excerpt.trim() !== data.title.trim();
+---
+
+<article
+  class:list={[
+    'group relative flex',
+    featured ? 'flex-col gap-8 lg:flex-row lg:items-center' : 'flex-col',
+    className,
+  ]}
+>
+  {
+    data.image ? (
+      <div
+        class:list={[
+          'overflow-hidden rounded-card bg-paper-deep',
+          featured ? 'lg:w-1/2 shrink-0' : '',
+        ]}
+      >
+        <img
+          src={data.image}
+          alt={data.imageAlt ?? ''}
+          loading="lazy"
+          decoding="async"
+          class:list={[
+            'w-full object-cover transition-transform duration-700 ease-out-soft group-hover:scale-[1.04]',
+            featured ? 'aspect-[16/10]' : 'aspect-[16/9]',
+          ]}
+        />
+      </div>
+    ) : (
+      /* Sin imagen el bloque no se deja vacío: un filete cálido marca
+         el sitio y mantiene la alineación de la rejilla. */
+      <div
+        aria-hidden="true"
+        class:list={[
+          'rounded-card bg-clay-50',
+          featured ? 'lg:w-1/2 aspect-[16/10] shrink-0' : 'h-1.5 w-16',
+        ]}
+      />
+    )
+  }
+
+  <div class:list={[featured ? 'lg:flex-1' : 'mt-5']}>
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
+      <span class="font-semibold text-clay-700">
+        {CONTENT_TYPE_LABELS[data.contentType]}
+      </span>
+      <span aria-hidden="true">·</span>
+      <time datetime={data.publishedAt.toISOString()} class="tabular">
+        {formatDate(data.publishedAt)}
+      </time>
+    </p>
+
+    <h3
+      class:list={[
+        'mt-3 font-display leading-snug font-extrabold text-end-900',
+        featured ? 'text-3xl' : 'text-lg',
+      ]}
+    >
+      <a href={`/para-docentes/${item.id}/`} class="after:absolute after:inset-0">
+        <span class="link-underline">{data.title}</span>
+      </a>
+    </h3>
+
+    {
+      showExcerpt && (
+        <p
+          class:list={[
+            'mt-3.5 leading-relaxed text-ink-soft',
+            featured ? 'text-lg line-clamp-3' : 'line-clamp-2',
+          ]}
+        >
+          {data.excerpt}
+        </p>
+      )
+    }
+
+    <!-- El origen institucional se declara siempre, no se da por supuesto. -->
+    <p class="mt-4 inline-flex items-center gap-2 text-sm text-ink-muted">
+      <Icon name="building" class="size-3.5 shrink-0" />
+      Portal END · {data.sourceTopic}
+    </p>
+  </div>
+</article>

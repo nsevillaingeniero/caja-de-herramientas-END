@@ -1,0 +1,23 @@
+{
+  "name": "Quizizz",
+  "shortDescription": "Cuestionarios gamificados que cada estudiante resuelve a su ritmo, en clase o como tarea.",
+  "description": "Quizizz plantea cuestionarios con mecánicas de juego, pero a diferencia de un concurso proyectado, cada estudiante avanza a su propio ritmo en su dispositivo, con la pregunta completa en pantalla.\n\nEso lo hace apto tanto para clase en vivo como para asignar tareas con fecha límite. Ofrece además reportes por estudiante y por pregunta, útiles para detectar qué contenido no quedó claro en el grupo.",
+  "activities": [
+    "Cuestionarios gamificados en clase",
+    "Tareas autoevaluables con fecha límite",
+    "Diagnósticos de inicio de unidad",
+    "Repasos con retroalimentación inmediata"
+  ],
+  "modality": "web",
+  "pricing": "freemium",
+  "pricingNote": "El plan gratuito cubre el uso habitual de aula.",
+  "categories": ["evaluacion", "actividades-interactivas"],
+  "moodleIntegration": "enlace",
+  "moodleUsage": "Comparte el enlace de la actividad desde un recurso «URL» del curso. Descarga los reportes desde Quizizz para revisar el desempeño del grupo.",
+  "languages": ["Español", "Inglés"],
+  "url": "https://quizizz.com",
+  "intents": ["evaluar", "crear-actividad"],
+  "tags": ["cuestionario", "gamificación", "repaso", "autoevaluación"],
+  "featured": false,
+  "order": 8
+}

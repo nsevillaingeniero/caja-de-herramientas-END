@@ -1,0 +1,93 @@
+---
+import Icon from '../primitives/Icon.astro';
+import { accent as accentStyles, type Accent } from '../../lib/accents';
+
+/**
+ * Encabezado de sección editorial: filete de color, antetítulo y
+ * titular. El filete sustituye a los marcos de tarjeta como forma de
+ * separar bloques, que era lo que saturaba la página anterior.
+ */
+interface Props {
+  title: string;
+  eyebrow?: string;
+  description?: string;
+  /** Enlace "ver todo", alineado con el titular. */
+  href?: string;
+  linkLabel?: string;
+  accent?: Accent;
+  id?: string;
+  onDark?: boolean;
+  class?: string;
+}
+
+const {
+  title,
+  eyebrow,
+  description,
+  href,
+  linkLabel = 'Ver todo',
+  accent = 'end',
+  id,
+  onDark = false,
+  class: className = '',
+} = Astro.props;
+
+const tokens = accentStyles(accent);
+---
+
+<div class={className}>
+  <div aria-hidden="true" class={`h-[3px] w-12 rounded-full ${tokens.rule}`}></div>
+
+  <div class="mt-5 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+    <div class="max-w-2xl">
+      {
+        eyebrow && (
+          <p class:list={['eyebrow mb-2', onDark ? tokens.onDeep : tokens.text]}>
+            {eyebrow}
+          </p>
+        )
+      }
+
+      <h2
+        id={id}
+        class:list={[
+          'font-display text-section font-extrabold',
+          onDark ? 'text-white' : 'text-end-900',
+        ]}
+      >
+        {title}
+      </h2>
+
+      {
+        description && (
+          <p
+            class:list={[
+              'mt-3 text-lg leading-relaxed',
+              onDark ? 'text-white/70' : 'text-ink-soft',
+            ]}
+          >
+            {description}
+          </p>
+        )
+      }
+    </div>
+
+    {
+      href && (
+        <a
+          href={href}
+          class:list={[
+            'group inline-flex shrink-0 items-center gap-2 font-semibold',
+            onDark ? 'text-white' : tokens.text,
+          ]}
+        >
+          <span class="link-underline">{linkLabel}</span>
+          <Icon
+            name="arrow"
+            class="size-4 transition-transform duration-300 group-hover:translate-x-1"
+          />
+        </a>
+      )
+    }
+  </div>
+</div>

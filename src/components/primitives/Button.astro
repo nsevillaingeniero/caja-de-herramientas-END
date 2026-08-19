@@ -1,0 +1,100 @@
+---
+import Icon from './Icon.astro';
+
+/**
+ * Botón/enlace. Renderiza <a> si recibe `href`, si no <button>.
+ * Así el elemento semántico siempre corresponde a la acción real.
+ *
+ * `onDark` es para las bandas de color: invierte el contraste en vez
+ * de obligar a cada página a recomponer las clases a mano.
+ */
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'teal' | 'clay' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  onDark?: boolean;
+  icon?: string;
+  iconPosition?: 'start' | 'end';
+  external?: boolean;
+  type?: 'button' | 'submit';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  onDark = false,
+  icon,
+  iconPosition = 'end',
+  external = false,
+  type = 'button',
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const variants: Record<string, string> = {
+  primary: 'bg-end-600 text-white hover:bg-end-700 active:bg-end-800',
+  teal: 'bg-teal-600 text-white hover:bg-teal-700 active:bg-teal-800',
+  clay: 'bg-clay-600 text-white hover:bg-clay-700 active:bg-clay-800',
+  secondary:
+    'text-end-800 ring-1 ring-inset ring-outline hover:bg-paper hover:ring-end-600',
+  ghost: 'text-end-700 hover:bg-end-50 active:bg-end-100',
+};
+
+const onDarkVariants: Record<string, string> = {
+  primary: 'bg-white text-end-900 hover:bg-end-50',
+  teal: 'bg-white text-teal-900 hover:bg-teal-50',
+  clay: 'bg-white text-clay-900 hover:bg-clay-50',
+  secondary:
+    'text-white ring-1 ring-inset ring-white/35 hover:bg-white/10 hover:ring-white/60',
+  ghost: 'text-white hover:bg-white/10',
+};
+
+const sizes: Record<string, string> = {
+  sm: 'text-sm px-3 py-1.5 gap-1.5',
+  md: 'text-[0.9375rem] px-4 py-2.5 gap-2',
+  lg: 'text-base px-6 py-3.5 gap-2.5',
+};
+
+const palette = onDark ? onDarkVariants : variants;
+
+const base = [
+  'inline-flex items-center justify-center rounded-control',
+  'font-semibold transition-colors duration-200',
+  palette[variant],
+  sizes[size],
+  onDark ? 'on-dark' : '',
+  className,
+].join(' ');
+
+const externalAttrs = external
+  ? { target: '_blank', rel: 'noopener noreferrer' }
+  : {};
+---
+
+{
+  href ? (
+    <a href={href} class={base} {...externalAttrs} {...rest}>
+      {icon && iconPosition === 'start' && (
+        <Icon name={icon} class="size-4 shrink-0" />
+      )}
+      <slot />
+      {icon && iconPosition === 'end' && (
+        <Icon name={icon} class="size-4 shrink-0" />
+      )}
+      {external && !icon && <Icon name="external" class="size-4 shrink-0" />}
+    </a>
+  ) : (
+    <button type={type} class={base} {...rest}>
+      {icon && iconPosition === 'start' && (
+        <Icon name={icon} class="size-4 shrink-0" />
+      )}
+      <slot />
+      {icon && iconPosition === 'end' && (
+        <Icon name={icon} class="size-4 shrink-0" />
+      )}
+    </button>
+  )
+}

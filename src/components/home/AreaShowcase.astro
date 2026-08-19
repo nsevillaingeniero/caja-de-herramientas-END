@@ -1,0 +1,268 @@
+---
+import { Image } from 'astro:assets';
+
+import Icon from '../primitives/Icon.astro';
+import {
+  formatDate,
+  formatDuration,
+  LEVEL_LABELS,
+  type Category,
+  type TeacherContent,
+  type Tutorial,
+} from '../../lib/content';
+import campusImage from '../../assets/institutional/sede-end.jpg';
+import { isAreaVisible } from '../../lib/accents';
+
+/**
+ * Las tres áreas, como tres piezas flotantes.
+ *
+ * No son tres tarjetas iguales. END Digital es el bloque dominante
+ * —panel profundo, elevado sobre las otras dos— porque es el área
+ * propia de la institución; Recursos y Para docentes son superficies
+ * claras que la acompañan. Cada una lleva dentro contenido real:
+ * categorías con su volumen, el tutorial destacado, la última
+ * publicación del portal. El docente ve qué hay antes de entrar.
+ */
+interface Props {
+  categories: { category: Category; count: number }[];
+  resourceCount: number;
+  tutorial?: Tutorial;
+  tutorialCount: number;
+  paths: { category: Category; tutorials: Tutorial[] }[];
+  publication?: TeacherContent;
+  accessCount: number;
+}
+
+const {
+  categories,
+  resourceCount,
+  tutorial,
+  tutorialCount,
+  publication,
+  accessCount,
+} = Astro.props;
+
+/** "Para docentes" puede estar oculta: entonces son dos piezas, no tres. */
+const showTeacher = isAreaVisible('para-docentes');
+
+/** Las categorías más pobladas: lo que de verdad hay para explorar. */
+const topCategories = [...categories]
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 5);
+---
+
+<section
+  aria-labelledby="areas-title"
+  class="mx-auto max-w-[78rem] px-5 pt-16 pb-16 sm:px-8 lg:pt-20 lg:pb-20"
+>
+  <h2 id="areas-title" class="sr-only">Las tres áreas de la plataforma</h2>
+
+  <div
+    class:list={[
+      'reveal grid gap-5 lg:items-start lg:gap-6',
+      showTeacher ? 'lg:grid-cols-3' : 'lg:grid-cols-2',
+    ]}
+  >
+    {/* ── RECURSOS ─────────────────────────────────────────── */}
+    <article
+      class="group lift relative flex flex-col overflow-hidden rounded-panel bg-white p-7 shadow-float ring-1 ring-border lg:p-8"
+    >
+      <div
+        aria-hidden="true"
+        class="absolute -top-20 -right-16 size-48 rounded-full bg-end-100/70 blur-2xl transition-transform duration-700 group-hover:scale-125"
+      >
+      </div>
+
+      <div class="relative flex items-center justify-between">
+        <span
+          class="grid size-11 place-items-center rounded-[0.9rem] bg-end-600 text-white shadow-glow-end"
+        >
+          <Icon name="layers" class="size-5" />
+        </span>
+        <span class="tabular text-sm font-bold text-end-600">
+          {resourceCount}
+        </span>
+      </div>
+
+      <h3 class="relative mt-7 font-display text-2xl font-extrabold text-end-950">
+        <a href="/recursos/" class="after:absolute after:inset-0">
+          <span class="link-underline">Recursos</span>
+        </a>
+      </h3>
+
+      <p class="relative mt-3 leading-relaxed text-ink-soft">
+        Herramientas digitales seleccionadas, con lo que necesitas saber antes
+        de usarlas.
+      </p>
+
+      <ul class="relative mt-6 flex flex-wrap gap-1.5">
+        {
+          topCategories.map(({ category, count }) => (
+            <li class="flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-[0.8125rem] font-medium text-ink-soft ring-1 ring-border transition-colors duration-300 group-hover:bg-end-50 group-hover:ring-end-100">
+              {category.data.name}
+              <span class="tabular text-[0.6875rem] font-bold text-end-600">
+                {count}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p
+        class="relative mt-auto flex items-center gap-2 pt-8 text-[0.9375rem] font-semibold text-end-700"
+      >
+        Explorar el catálogo
+        <Icon
+          name="arrow"
+          class="size-4 transition-transform duration-300 group-hover:translate-x-1.5"
+        />
+      </p>
+    </article>
+
+    {/* ── END DIGITAL ───────────────────────────────────────
+        El bloque dominante: fondo profundo, elevado medio paso
+        sobre las otras dos piezas en escritorio. */}
+    <article
+      class="group lift on-dark relative flex flex-col overflow-hidden rounded-panel bg-teal-950 p-7 text-white shadow-lift lg:-translate-y-5 lg:p-8"
+    >
+      <div aria-hidden="true" class="absolute inset-0">
+        <div class="dot-grid-dark absolute inset-0 opacity-70"></div>
+        <span
+          class="orb animate-drift -top-24 -left-16 size-64 bg-teal-400/50"
+        ></span>
+        <span
+          class="orb animate-drift-slow -right-20 -bottom-24 size-56 bg-end-500/45"
+        ></span>
+      </div>
+
+      <div class="relative flex items-center justify-between">
+        <span
+          class="grid size-11 place-items-center rounded-[0.9rem] bg-teal-400 text-teal-950 shadow-glow-teal"
+        >
+          <Icon name="play" class="size-5" />
+        </span>
+        <span class="tabular text-sm font-bold text-teal-300">
+          {tutorialCount}
+        </span>
+      </div>
+
+      <h3 class="relative mt-7 font-display text-2xl font-extrabold text-white">
+        <a href="/end-digital/" class="after:absolute after:inset-0">
+          <span class="link-underline">END Digital</span>
+        </a>
+      </h3>
+
+      <p class="relative mt-3 leading-relaxed text-white/70">
+        Aprende a utilizar y aprovechar tu aula virtual, paso a paso.
+      </p>
+
+      {
+        tutorial && (
+          <div class="glass-dark relative mt-6 rounded-card p-4">
+            <p class="eyebrow text-teal-300">Empieza por aquí</p>
+            <p class="mt-2.5 leading-snug font-semibold text-white">
+              {tutorial.data.title}
+            </p>
+            <p class="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-white/60">
+              <span class="tabular">
+                {formatDuration(tutorial.data.duration)}
+              </span>
+              <span aria-hidden="true" class="opacity-50">
+                ·
+              </span>
+              <span>{LEVEL_LABELS[tutorial.data.level]}</span>
+            </p>
+          </div>
+        )
+      }
+
+      <p
+        class="relative mt-auto flex items-center gap-2 pt-8 text-[0.9375rem] font-semibold text-teal-300"
+      >
+        Ver los tutoriales
+        <Icon
+          name="arrow"
+          class="size-4 transition-transform duration-300 group-hover:translate-x-1.5"
+        />
+      </p>
+    </article>
+
+    {/* ── PARA DOCENTES ─────────────────────────────────────── */}
+    {showTeacher && (
+    <article
+      class="group lift relative flex flex-col overflow-hidden rounded-panel bg-white p-7 shadow-float ring-1 ring-border lg:p-8"
+    >
+      <div
+        aria-hidden="true"
+        class="absolute -top-20 -right-16 size-48 rounded-full bg-clay-100/80 blur-2xl transition-transform duration-700 group-hover:scale-125"
+      >
+      </div>
+
+      <div class="relative flex items-center justify-between">
+        <span
+          class="grid size-11 place-items-center rounded-[0.9rem] bg-clay-400 text-clay-950 shadow-glow-clay"
+        >
+          <Icon name="building" class="size-5" />
+        </span>
+        <span class="tabular text-sm font-bold text-clay-600">
+          {accessCount}
+        </span>
+      </div>
+
+      <h3 class="relative mt-7 font-display text-2xl font-extrabold text-end-950">
+        <a href="/para-docentes/" class="after:absolute after:inset-0">
+          <span class="link-underline">Para docentes</span>
+        </a>
+      </h3>
+
+      <p class="relative mt-3 leading-relaxed text-ink-soft">
+        Accesos directos y publicaciones del portal institucional de la Escuela.
+      </p>
+
+      {/* La sede, recortada en óvalo junto a la última publicación:
+          la fotografía identifica el área sin ocupar un bloque. */}
+      <div class="relative mt-6 flex items-center gap-4">
+        <Image
+          src={campusImage}
+          alt=""
+          widths={[176, 264]}
+          sizes="5.5rem"
+          loading="lazy"
+          class="mask-blob size-[4.5rem] shrink-0 object-cover ring-2 ring-white transition-transform duration-700 group-hover:scale-105"
+        />
+
+        {
+          publication ? (
+            <div class="min-w-0">
+              <p class="eyebrow text-clay-600">Lo más reciente</p>
+              <p class="mt-1.5 line-clamp-2 text-[0.9375rem] leading-snug font-semibold text-end-950">
+                {publication.data.title}
+              </p>
+              <p class="mt-1 text-xs text-ink-muted">
+                <time datetime={publication.data.publishedAt.toISOString()}>
+                  {formatDate(publication.data.publishedAt)}
+                </time>
+              </p>
+            </div>
+          ) : (
+            <p class="text-[0.9375rem] leading-snug text-ink-soft">
+              Noticias, convocatorias y eventos de la Escuela Nacional del
+              Deporte.
+            </p>
+          )
+        }
+      </div>
+
+      <p
+        class="relative mt-auto flex items-center gap-2 pt-8 text-[0.9375rem] font-semibold text-clay-600"
+      >
+        Ver la sección
+        <Icon
+          name="arrow"
+          class="size-4 transition-transform duration-300 group-hover:translate-x-1.5"
+        />
+      </p>
+    </article>
+    )}
+  </div>
+</section>

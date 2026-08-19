@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/primitives/Button.astro';
+import Icon from '../components/primitives/Icon.astro';
+
+import { getIntents } from '../lib/content';
+import { accent as accentStyles } from '../lib/accents';
+
+const intents = await getIntents();
+---
+
+<BaseLayout title="Página no encontrada" noindex>
+  <section class="on-dark bg-end-950 py-20 text-white lg:py-28">
+    <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
+      <p class="eyebrow text-teal-300">Error 404</p>
+
+      <h1 class="mt-6 max-w-3xl font-display text-title font-extrabold text-white">
+        No encontramos esta página
+      </h1>
+
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-white/75">
+        Puede que el enlace haya cambiado. Prueba con el buscador o empieza por
+        lo que necesitas hacer.
+      </p>
+
+      <div class="mt-10 flex flex-wrap gap-3">
+        <Button href="/" icon="arrow-left" iconPosition="start" onDark>
+          Volver al inicio
+        </Button>
+        <Button
+          variant="secondary"
+          data-search-open
+          icon="search"
+          iconPosition="start"
+          onDark
+        >
+          Buscar
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-16 sm:px-8">
+    <h2 class="eyebrow text-ink-muted">¿Qué quieres hacer?</h2>
+
+    <ul class="mt-6 border-t border-border">
+      {
+        intents.map((intent) => {
+          const tokens = accentStyles(intent.data.accent);
+
+          return (
+            <li class="border-b border-border">
+              <a
+                href={`/necesito/${intent.id}/`}
+                class="group flex items-center gap-4 py-4"
+              >
+                <Icon
+                  name={intent.data.icon}
+                  class:list={[
+                    'size-5 shrink-0 text-ink-muted transition-colors',
+                    tokens.hoverText,
+                  ]}
+                />
+                <span class="font-display text-lg font-bold text-end-900">
+                  <span class="link-underline">{intent.data.label}</span>
+                </span>
+                <Icon
+                  name="arrow"
+                  class:list={[
+                    'ml-auto size-4 shrink-0 text-ink-muted transition-all duration-300 group-hover:translate-x-1',
+                    tokens.hoverText,
+                  ]}
+                />
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</BaseLayout>

@@ -1,0 +1,125 @@
+---
+import Icon from '../primitives/Icon.astro';
+import { accent as accentStyles, type Accent } from '../../lib/accents';
+
+/**
+ * Cabecera de página.
+ *
+ * `tone="deep"` abre las tres secciones principales con una banda del
+ * color de su área: es lo que hace que Recursos, END Digital y Para
+ * docentes no se confundan entre sí al llegar.
+ * `tone="light"` es para páginas interiores, donde la banda de color
+ * competiría con el contenido.
+ */
+interface Props {
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  accent?: Accent;
+  tone?: 'deep' | 'light';
+  breadcrumbs?: { href: string; label: string }[];
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  eyebrow,
+  accent = 'end',
+  tone = 'light',
+  breadcrumbs = [],
+  class: className = '',
+} = Astro.props;
+
+const tokens = accentStyles(accent);
+const deep = tone === 'deep';
+---
+
+<section
+  class:list={[
+    'relative overflow-hidden',
+    deep ? `on-dark ${tokens.deep} text-white` : 'border-b border-border bg-white',
+    className,
+  ]}
+>
+  {
+    !deep && (
+      <div aria-hidden="true" class={`absolute inset-x-0 top-0 h-1 ${tokens.rule}`} />
+    )
+  }
+
+  <div
+    class:list={[
+      'mx-auto max-w-[78rem] px-5 sm:px-8',
+      deep ? 'py-14 lg:py-20' : 'py-10 lg:py-14',
+    ]}
+  >
+    {
+      breadcrumbs.length > 0 && (
+        <nav aria-label="Ruta de navegación" class="mb-6">
+          <ol
+            class:list={[
+              'flex flex-wrap items-center gap-2 text-sm',
+              deep ? 'text-white/60' : 'text-ink-muted',
+            ]}
+          >
+            {breadcrumbs.map((crumb, index) => (
+              <li class="flex items-center gap-2">
+                {index > 0 && (
+                  <Icon name="chevron-right" class="size-3.5 shrink-0 opacity-50" />
+                )}
+                <a
+                  href={crumb.href}
+                  class:list={[
+                    'link-underline',
+                    deep ? 'hover:text-white' : 'hover:text-end-800',
+                  ]}
+                >
+                  {crumb.label}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <div class="max-w-3xl">
+        {
+          eyebrow && (
+            <p class:list={['eyebrow', deep ? tokens.onDeep : tokens.text]}>
+              {eyebrow}
+            </p>
+          )
+        }
+
+        <h1
+          class:list={[
+            'mt-3 font-display font-extrabold',
+            deep ? 'text-title text-white' : 'text-section text-end-900',
+          ]}
+        >
+          {title}
+        </h1>
+
+        {
+          description && (
+            <p
+              class:list={[
+                'mt-5 max-w-2xl text-lg leading-relaxed',
+                deep ? 'text-white/75' : 'text-ink-soft',
+              ]}
+            >
+              {description}
+            </p>
+          )
+        }
+      </div>
+
+      <slot name="aside" />
+    </div>
+
+    <slot />
+  </div>
+</section>

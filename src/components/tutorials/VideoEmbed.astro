@@ -1,0 +1,88 @@
+---
+/**
+ * Incrustación de video con carga diferida.
+ *
+ * No se carga el iframe hasta que el docente pulsa reproducir: evita
+ * traer el reproductor de YouTube (y sus cookies) en cada visita.
+ */
+interface Props {
+  url: string;
+  title: string;
+}
+
+const { url, title } = Astro.props;
+
+/** Extrae el identificador de YouTube de las formas de URL habituales. */
+function youtubeId(value: string): string | null {
+  const match = value.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/,
+  );
+  return match?.[1] ?? null;
+}
+
+const id = youtubeId(url);
+const embedUrl = id ? `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0` : null;
+const poster = id ? `https://i.ytimg.com/vi/${id}/maxresdefault.jpg` : null;
+---
+
+{
+  embedUrl ? (
+    <div
+      class="relative aspect-video overflow-hidden rounded-card bg-end-950"
+      data-video
+      data-embed={embedUrl}
+    >
+      {poster && (
+        <img
+          src={poster}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          class="size-full object-cover opacity-75"
+        />
+      )}
+
+      <button
+        type="button"
+        data-video-play
+        class="absolute inset-0 grid place-items-center transition-colors hover:bg-black/10"
+      >
+        <span class="sr-only">Reproducir el video: {title}</span>
+        <span class="grid size-16 place-items-center rounded-full bg-white shadow-lg transition-transform duration-300 hover:scale-110">
+          <svg viewBox="0 0 24 24" class="ml-1 size-7 fill-teal-800" aria-hidden="true">
+            <path d="M8 5.5v13l11-6.5-11-6.5Z" />
+          </svg>
+        </span>
+      </button>
+    </div>
+  ) : (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex aspect-video items-center justify-center rounded-card bg-end-950 text-sm font-semibold text-white"
+    >
+      Ver el video en una nueva pestaña
+    </a>
+  )
+}
+
+<script>
+  document.querySelectorAll('[data-video-play]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const container = button.closest('[data-video]') as HTMLElement | null;
+      const embed = container?.dataset.embed;
+      if (!container || !embed) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = embed;
+      iframe.title = 'Video del tutorial';
+      iframe.className = 'absolute inset-0 size-full';
+      iframe.allow =
+        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+
+      container.replaceChildren(iframe);
+    });
+  });
+</script>

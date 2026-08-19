@@ -1,0 +1,277 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import RelatedContent from '../../components/shared/RelatedContent.astro';
+import VideoEmbed from '../../components/tutorials/VideoEmbed.astro';
+import Button from '../../components/primitives/Button.astro';
+import Icon from '../../components/primitives/Icon.astro';
+
+import {
+  getTutorials,
+  getTutorialNeighbors,
+  getCategories,
+  LEVEL_LABELS,
+  formatDate,
+  formatDuration,
+  type Tutorial,
+} from '../../lib/content';
+import { getRelatedToTutorial } from '../../lib/relations';
+
+interface Props {
+  tutorial: Tutorial;
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const tutorials = await getTutorials();
+  return tutorials.map((tutorial) => ({
+    params: { slug: tutorial.id },
+    props: { tutorial },
+  }));
+};
+
+const { tutorial } = Astro.props;
+const { data } = tutorial;
+
+const [{ Content }, categories, neighbors, related] = await Promise.all([
+  render(tutorial),
+  getCategories(),
+  getTutorialNeighbors(tutorial),
+  getRelatedToTutorial(tutorial),
+]);
+
+const category = categories.find((c) => c.id === data.category.id);
+---
+
+<BaseLayout title={data.title} description={data.description}>
+  <PageHeader
+    eyebrow={category?.data.name}
+    title={data.title}
+    description={data.description}
+    accent="teal"
+    tone="deep"
+    breadcrumbs={[
+      { href: '/', label: 'Inicio' },
+      { href: '/end-digital/', label: 'END Digital' },
+    ]}
+  >
+    <div
+      class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.9375rem] text-white/70"
+    >
+      <span class="font-semibold text-white">{LEVEL_LABELS[data.level]}</span>
+      <span aria-hidden="true">·</span>
+      <span class="tabular inline-flex items-center gap-1.5">
+        <Icon name="clock" class="size-4" />
+        {formatDuration(data.duration)}
+      </span>
+      {
+        data.video && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span class="inline-flex items-center gap-1.5">
+              <Icon name="circle-play" class="size-4" />
+              Con video
+            </span>
+          </>
+        )
+      }
+      <span aria-hidden="true">·</span>
+      <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
+    </div>
+  </PageHeader>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-14 sm:px-8 lg:py-16">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
+      <div class="min-w-0">
+        {data.video && <VideoEmbed url={data.video} title={data.title} />}
+
+        <!-- Cuerpo del tutorial. Los estilos tipográficos se aplican aquí
+             porque el HTML proviene de Markdown y no lleva clases. -->
+        <div class:list={['prose-tutorial text-lg leading-relaxed text-ink-soft', data.video && 'mt-10']}>
+          <Content />
+        </div>
+
+        <RelatedContent items={related} />
+
+        <!-- Navegación secuencial dentro de la ruta -->
+        {
+          (neighbors.previous || neighbors.next) && (
+            <nav
+              aria-label="Navegación entre tutoriales"
+              class="mt-16 grid gap-px overflow-hidden rounded-card bg-border sm:grid-cols-2"
+            >
+              {neighbors.previous ? (
+                <a
+                  href={`/end-digital/${neighbors.previous.id}/`}
+                  class="group flex flex-col bg-paper p-6 transition-colors hover:bg-teal-50"
+                >
+                  <span class="inline-flex items-center gap-2 text-sm font-semibold text-ink-muted">
+                    <Icon
+                      name="arrow-left"
+                      class="size-4 transition-transform duration-300 group-hover:-translate-x-1"
+                    />
+                    Anterior
+                  </span>
+                  <span class="mt-2.5 font-display font-bold text-end-900">
+                    {neighbors.previous.data.title}
+                  </span>
+                </a>
+              ) : (
+                <span class="hidden bg-paper sm:block" />
+              )}
+
+              {neighbors.next && (
+                <a
+                  href={`/end-digital/${neighbors.next.id}/`}
+                  class="group flex flex-col bg-paper p-6 text-right transition-colors hover:bg-teal-50 sm:col-start-2"
+                >
+                  <span class="inline-flex items-center justify-end gap-2 text-sm font-semibold text-ink-muted">
+                    Siguiente
+                    <Icon
+                      name="arrow"
+                      class="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </span>
+                  <span class="mt-2.5 font-display font-bold text-end-900">
+                    {neighbors.next.data.title}
+                  </span>
+                </a>
+              )}
+            </nav>
+          )
+        }
+      </div>
+
+      <!-- Columna lateral: pasos y material -->
+      <aside class="lg:sticky lg:top-28 lg:self-start">
+        {
+          data.steps.length > 0 && (
+            <div>
+              <h2 class="eyebrow text-ink-muted">En este tutorial</h2>
+              <ol class="mt-5 border-t border-border">
+                {data.steps.map((step, index) => (
+                  <li class="flex gap-4 border-b border-border py-3.5 text-[0.9375rem] leading-relaxed text-ink-soft">
+                    <span
+                      aria-hidden="true"
+                      class="tabular shrink-0 font-display text-sm font-bold text-teal-700"
+                    >
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )
+        }
+
+        {
+          data.guide && (
+            <div class="mt-9">
+              <h2 class="eyebrow text-ink-muted">Material complementario</h2>
+              <div class="mt-4">
+                <Button
+                  href={data.guide.url}
+                  variant="secondary"
+                  size="sm"
+                  icon="external"
+                  external
+                >
+                  {data.guide.label}
+                </Button>
+              </div>
+            </div>
+          )
+        }
+
+        {
+          category && (
+            <a
+              href={`/end-digital/categoria/${category.id}/`}
+              class="group mt-9 flex items-center gap-3 border-t border-border pt-6"
+            >
+              <Icon name={category.data.icon} class="size-5 shrink-0 text-teal-700" />
+              <span class="min-w-0 flex-1">
+                <span class="eyebrow block text-ink-muted">Más de</span>
+                <span class="mt-1 block truncate font-semibold text-end-900">
+                  <span class="link-underline">{category.data.name}</span>
+                </span>
+              </span>
+              <Icon
+                name="arrow"
+                class="size-4 shrink-0 text-ink-muted transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </a>
+          )
+        }
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  /* Tipografía del cuerpo del tutorial (HTML generado desde Markdown). */
+  .prose-tutorial h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-end-900);
+    margin-top: 2.75rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .prose-tutorial h3 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-end-900);
+    margin-top: 2rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .prose-tutorial p {
+    margin-bottom: 1.25rem;
+  }
+
+  .prose-tutorial ul,
+  .prose-tutorial ol {
+    margin: 0 0 1.4rem 0;
+    padding-left: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .prose-tutorial ul {
+    list-style: disc;
+  }
+
+  .prose-tutorial ol {
+    list-style: decimal;
+  }
+
+  .prose-tutorial li::marker {
+    color: var(--color-teal-600);
+  }
+
+  .prose-tutorial strong {
+    font-weight: 600;
+    color: var(--color-end-900);
+  }
+
+  .prose-tutorial code {
+    background: var(--color-paper-deep);
+    border-radius: 0.3rem;
+    padding: 0.15em 0.4em;
+    font-size: 0.9em;
+  }
+
+  .prose-tutorial a {
+    color: var(--color-teal-700);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

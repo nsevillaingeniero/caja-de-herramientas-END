@@ -1,0 +1,192 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import TeacherContentCard from '../../components/teacher/TeacherContentCard.astro';
+import InstitutionalAccess from '../../components/teacher/InstitutionalAccess.astro';
+import Button from '../../components/primitives/Button.astro';
+import Icon from '../../components/primitives/Icon.astro';
+
+import { SITE } from '../../config/site.mjs';
+import {
+  CONTENT_TYPE_LABELS,
+  getInstitutionalLinks,
+  getTeacherContent,
+} from '../../lib/content';
+
+const [items, accesses] = await Promise.all([
+  getTeacherContent(),
+  getInstitutionalLinks(),
+]);
+
+const [featured, ...rest] = items;
+
+// Filtros por tipo, generados a partir de lo que realmente llegó del portal.
+const types = [...new Set(items.map((item) => item.data.contentType))];
+
+/** Ficha de filtro: la casilla real queda oculta bajo la etiqueta. */
+const chip =
+  'group inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200 ' +
+  'text-ink-soft ring-1 ring-inset ring-border-strong hover:ring-clay-600 hover:text-clay-800 ' +
+  'has-[:checked]:bg-clay-700 has-[:checked]:text-white has-[:checked]:ring-clay-700 ' +
+  'has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-teal-500';
+---
+
+<BaseLayout
+  title="Para docentes"
+  description="Accesos al portal institucional y publicaciones de la Escuela Nacional del Deporte de interés para sus docentes: convocatorias, normativa, trámites y noticias."
+
+  noindex
+>
+  <PageHeader
+    eyebrow="Portal institucional"
+    title="Para docentes"
+    description="Los accesos del portal de la Escuela Nacional del Deporte que necesitas a mano, y sus publicaciones más recientes."
+    accent="clay"
+    tone="deep"
+    breadcrumbs={[{ href: '/', label: 'Inicio' }]}
+  >
+    <p
+      slot="aside"
+      class="tabular shrink-0 font-display text-5xl font-extrabold text-clay-300"
+    >
+      {accesses.length}
+      <span class="mt-1 block text-sm font-semibold tracking-wide text-white/60">
+        accesos directos
+      </span>
+    </p>
+
+    <!-- La procedencia se declara de forma explícita y visible. -->
+    <p
+      class="mt-9 flex max-w-2xl items-start gap-3 border-t border-white/20 pt-6 text-[0.9375rem] text-white/70"
+    >
+      <Icon name="building" class="mt-1 size-4 shrink-0" />
+      <span>
+        Esta sección reúne y ordena contenidos publicados en el
+        <a
+          href={SITE.portal.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-semibold text-white underline decoration-clay-300 underline-offset-4 hover:decoration-2"
+        >
+          portal oficial de la END</a
+        >, que sigue siendo la fuente autorizada.
+      </span>
+    </p>
+  </PageHeader>
+
+  <InstitutionalAccess />
+
+  <section aria-labelledby="publicaciones" class="mx-auto max-w-[78rem] px-5 py-16 sm:px-8 lg:py-20">
+    <div aria-hidden="true" class="h-[3px] w-12 rounded-full bg-clay-500"></div>
+    <h2
+      id="publicaciones"
+      class="mt-5 font-display text-section font-extrabold text-end-900"
+    >
+      Publicaciones del portal
+    </h2>
+    <p class="mt-3 max-w-2xl text-lg leading-relaxed text-ink-soft">
+      Noticias, convocatorias e información institucional, actualizadas desde
+      endeporte.edu.co.
+    </p>
+
+    {
+      items.length === 0 ? (
+        <div class="mt-12 rounded-panel bg-paper px-6 py-20 text-center">
+          <p class="font-display text-xl font-extrabold text-end-900">
+            No hay publicaciones disponibles
+          </p>
+          <p class="mx-auto mt-3 max-w-md text-ink-soft">
+            No se pudo obtener información del portal institucional en esta
+            ocasión. Puedes consultarla directamente en el sitio oficial.
+          </p>
+          <div class="mt-7 flex justify-center">
+            <Button href={SITE.portal.url} external variant="clay">
+              Ir al portal END
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {featured && (
+            <div class="reveal mt-12">
+              <TeacherContentCard item={featured} featured />
+            </div>
+          )}
+
+          <div class="mt-16">
+            <fieldset>
+              <legend class="sr-only">Filtrar publicaciones por tipo</legend>
+              <div class="flex flex-wrap gap-2.5">
+                <label class={chip}>
+                  <input
+                    type="radio"
+                    name="tipo"
+                    value="all"
+                    checked
+                    class="sr-only"
+                  />
+                  Todas
+                </label>
+                {types.map((type) => (
+                  <label class={chip}>
+                    <input type="radio" name="tipo" value={type} class="sr-only" />
+                    {CONTENT_TYPE_LABELS[type]}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <p class="mt-7 text-sm text-ink-muted" role="status" aria-live="polite">
+              <span data-teacher-count class="tabular font-bold text-end-900">
+                {rest.length}
+              </span>{' '}
+              <span data-teacher-noun>
+                {rest.length === 1 ? 'publicación' : 'publicaciones'}
+              </span>
+            </p>
+
+            <ul
+              data-teacher-grid
+              class="mt-8 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {rest.map((item) => (
+                <li data-teacher-item data-type={item.data.contentType} class="reveal">
+                  <TeacherContentCard item={item} class="h-full" />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<script>
+  const radios = Array.from(
+    document.querySelectorAll<HTMLInputElement>('input[name="tipo"]'),
+  );
+  const items = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-teacher-item]'),
+  );
+  const countEl = document.querySelector('[data-teacher-count]');
+  const nounEl = document.querySelector('[data-teacher-noun]');
+
+  function apply() {
+    const type = radios.find((radio) => radio.checked)?.value ?? 'all';
+
+    let visible = 0;
+    for (const item of items) {
+      const matches = type === 'all' || item.dataset.type === type;
+      item.hidden = !matches;
+      if (matches) visible += 1;
+    }
+
+    if (countEl) countEl.textContent = String(visible);
+    if (nounEl) {
+      nounEl.textContent = visible === 1 ? 'publicación' : 'publicaciones';
+    }
+  }
+
+  radios.forEach((radio) => radio.addEventListener('change', apply));
+</script>

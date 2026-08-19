@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import AreaShowcase from '../components/home/AreaShowcase.astro';
+import IntentList from '../components/home/IntentList.astro';
+import FeaturedResources from '../components/home/FeaturedResources.astro';
+import HomeTutorials from '../components/home/HomeTutorials.astro';
+
+import { SITE } from '../config/site.mjs';
+import { isAreaVisible } from '../lib/accents';
+import {
+  getCategories,
+  getFeaturedResources,
+  getFeaturedTutorial,
+  getInstitutionalLinks,
+  getResourceCategoriesWithCount,
+  getResources,
+  getTeacherContent,
+  getTutorialPaths,
+  getTutorials,
+} from '../lib/content';
+
+const [
+  categories,
+  categoriesWithCount,
+  resources,
+  featuredResources,
+  tutorials,
+  featuredTutorial,
+  paths,
+  teacher,
+  accesses,
+] = await Promise.all([
+  getCategories(),
+  getResourceCategoriesWithCount(),
+  getResources(),
+  getFeaturedResources(4),
+  getTutorials(),
+  getFeaturedTutorial(),
+  getTutorialPaths(),
+  getTeacherContent(),
+  getInstitutionalLinks(),
+]);
+
+/** Cifras reales del contenido: no se escriben a mano en la plantilla. */
+const showTeacherArea = isAreaVisible('para-docentes');
+
+const stats = [
+  { label: 'Herramientas en el catálogo', value: resources.length },
+  { label: 'Tutoriales de END Digital', value: tutorials.length },
+  ...(showTeacherArea
+    ? [{ label: 'Publicaciones del portal END', value: teacher.length }]
+    : []),
+];
+---
+
+<BaseLayout title={SITE.name} description={SITE.description}>
+  <Hero stats={stats} />
+
+  <AreaShowcase
+    categories={categoriesWithCount}
+    resourceCount={resources.length}
+    tutorial={featuredTutorial}
+    tutorialCount={tutorials.length}
+    paths={paths}
+    publication={teacher[0]}
+    accessCount={accesses.length}
+  />
+
+  <IntentList />
+
+  <FeaturedResources
+    resources={featuredResources}
+    categories={categories}
+    total={resources.length}
+  />
+
+  <HomeTutorials
+    featured={featuredTutorial}
+    tutorials={tutorials}
+    total={tutorials.length}
+  />
+</BaseLayout>

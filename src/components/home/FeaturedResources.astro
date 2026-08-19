@@ -1,0 +1,223 @@
+---
+import Icon from '../primitives/Icon.astro';
+import ResourceMark from '../resources/ResourceMark.astro';
+import {
+  MOODLE_LABELS,
+  PRICING_LABELS,
+  type Category,
+  type Resource,
+} from '../../lib/content';
+import { accent as accentStyles, type Accent } from '../../lib/accents';
+
+/**
+ * El catálogo, como una biblioteca digital.
+ *
+ * Una herramienta abre con espacio para explicarse —qué es, qué
+ * permite crear, cómo entra en el aula virtual— y las demás la
+ * acompañan como fichas más compactas. Cuatro tarjetas idénticas no
+ * dirían por dónde empezar.
+ *
+ * Mientras no haya logotipos oficiales, la identidad de cada
+ * herramienta la resuelve `ResourceMark` con una marca tipográfica.
+ */
+interface Props {
+  resources: Resource[];
+  categories: Category[];
+  total: number;
+}
+
+const { resources, categories, total } = Astro.props;
+
+const [lead, ...rest] = resources;
+
+const categoryOf = (resource: Resource) =>
+  categories.find((c) => c.id === resource.data.categories[0]?.id);
+
+const leadCategory = lead ? categoryOf(lead) : undefined;
+const leadAccent = (leadCategory?.data.accent ?? 'end') as Accent;
+
+/** Degradado del recurso destacado, por acento de su categoría. */
+const LEAD_GRADIENT: Record<Accent, string> = {
+  end: 'from-end-900 via-end-950 to-end-950',
+  teal: 'from-teal-800 via-teal-950 to-end-950',
+  clay: 'from-clay-800 via-clay-950 to-end-950',
+  slate: 'from-end-800 via-end-950 to-end-950',
+};
+---
+
+{
+  lead && (
+    <section
+      aria-labelledby="destacados-recursos"
+      class="mx-auto max-w-[78rem] px-5 py-20 sm:px-8 lg:py-28"
+    >
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div class="max-w-xl">
+          <p class="eyebrow text-end-600">Catálogo</p>
+          <h2
+            id="destacados-recursos"
+            class="mt-4 font-display text-title font-extrabold text-end-950"
+          >
+            Herramientas para transformar tus clases.
+          </h2>
+        </div>
+
+        <a
+          href="/recursos/"
+          class="group flex items-center gap-2.5 rounded-full bg-white py-2.5 pr-4 pl-5 text-[0.9375rem] font-semibold text-end-700 shadow-float ring-1 ring-border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift hover:ring-end-200"
+        >
+          Ver los {total} recursos
+          <span class="grid size-7 place-items-center rounded-full bg-end-50 transition-colors duration-300 group-hover:bg-end-600 group-hover:text-white">
+            <Icon name="arrow" class="size-3.5" />
+          </span>
+        </a>
+      </div>
+
+      <div class="reveal mt-12 grid gap-5 lg:grid-cols-[1.15fr_1fr] lg:gap-6">
+        {/* ── DESTACADO ─────────────────────────────────────────
+            Panel profundo: la herramienta principal no compite en
+            el mismo plano que las demás. */}
+        <article
+          class:list={[
+            'group on-dark lift relative flex flex-col overflow-hidden rounded-panel bg-linear-to-br p-8 text-white shadow-lift lg:p-10',
+            LEAD_GRADIENT[leadAccent],
+          ]}
+        >
+          <div aria-hidden="true" class="absolute inset-0">
+            <div class="dot-grid-dark absolute inset-0 opacity-60" />
+            <span class="orb animate-drift-slow -top-24 -right-16 size-72 bg-teal-400/35" />
+            <span class="orb animate-drift -bottom-28 -left-20 size-64 bg-end-400/35" />
+          </div>
+
+          <div class="relative flex items-start justify-between gap-4">
+            <ResourceMark
+              name={lead.data.name}
+              logo={lead.data.logo}
+              accent={leadAccent}
+              size="lg"
+              class="transition-transform duration-500 ease-out-soft group-hover:-translate-y-1.5"
+            />
+
+            <span class="eyebrow rounded-full bg-white/10 px-3.5 py-1.5 text-white/80 ring-1 ring-white/15">
+              Destacado
+            </span>
+          </div>
+
+          <h3 class="relative mt-8 font-display text-4xl font-extrabold text-white lg:text-5xl">
+            <a
+              href={`/recursos/${lead.id}/`}
+              class="after:absolute after:inset-0"
+            >
+              <span class="link-underline">{lead.data.name}</span>
+            </a>
+          </h3>
+
+          {leadCategory && (
+            <p class="relative mt-3 text-[0.9375rem] font-semibold text-teal-300">
+              {leadCategory.data.name}
+            </p>
+          )}
+
+          <p class="relative mt-5 max-w-md text-lg leading-relaxed text-white/75">
+            {lead.data.shortDescription}
+          </p>
+
+          <ul class="relative mt-7 flex flex-wrap gap-2">
+            {lead.data.activities.slice(0, 3).map((activity) => (
+              <li class="rounded-full bg-white/8 px-3.5 py-1.5 text-[0.8125rem] text-white/80 ring-1 ring-white/12 backdrop-blur-sm">
+                {activity}
+              </li>
+            ))}
+          </ul>
+
+          <p class="relative mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-10 text-sm text-white/60">
+            <span class="font-semibold text-white">
+              {PRICING_LABELS[lead.data.pricing]}
+            </span>
+            <span aria-hidden="true" class="opacity-50">
+              ·
+            </span>
+            <span>{MOODLE_LABELS[lead.data.moodleIntegration]}</span>
+            <Icon
+              name="arrow"
+              class="ml-auto size-5 text-white transition-transform duration-300 group-hover:translate-x-1.5"
+            />
+          </p>
+        </article>
+
+        {/* ── SECUNDARIOS ───────────────────────────────────────
+            Fichas claras, más compactas. La marca se despega al
+            pasar el cursor y aparece el filete de su categoría. */}
+        <ul class="grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:gap-5">
+          {rest.map((resource, index) => {
+            const category = categoryOf(resource);
+            const cardAccent = (category?.data.accent ?? 'end') as Accent;
+            const tokens = accentStyles(cardAccent);
+
+            return (
+              <li class="reveal-step" style={`--step:${index}`}>
+                <article class="group lift relative flex h-full items-center gap-5 overflow-hidden rounded-panel bg-white p-6 shadow-float ring-1 ring-border">
+                  {/* Filete de categoría: aparece por el costado. */}
+                  <span
+                    aria-hidden="true"
+                    class:list={[
+                      'absolute inset-y-0 left-0 w-0 transition-all duration-400 ease-out-soft group-hover:w-1.5',
+                      tokens.rule,
+                    ]}
+                  />
+
+                  <ResourceMark
+                    name={resource.data.name}
+                    logo={resource.data.logo}
+                    accent={cardAccent}
+                    class="transition-transform duration-500 ease-out-soft group-hover:-translate-y-1 group-hover:rotate-[-4deg]"
+                  />
+
+                  <div class="min-w-0 flex-1">
+                    <h3 class="font-display text-xl font-bold text-end-950">
+                      <a
+                        href={`/recursos/${resource.id}/`}
+                        class="after:absolute after:inset-0"
+                      >
+                        <span class="link-underline">{resource.data.name}</span>
+                      </a>
+                    </h3>
+
+                    <p class="mt-1.5 line-clamp-2 text-[0.9375rem] leading-snug text-ink-soft">
+                      {resource.data.shortDescription}
+                    </p>
+
+                    <p class="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                      {category && (
+                        <span
+                          class:list={[
+                            'rounded-full px-2.5 py-1 font-semibold',
+                            tokens.tint,
+                            tokens.onTint,
+                          ]}
+                        >
+                          {category.data.name}
+                        </span>
+                      )}
+                      <span class="text-ink-muted">
+                        {PRICING_LABELS[resource.data.pricing]}
+                      </span>
+                    </p>
+                  </div>
+
+                  <Icon
+                    name="arrow"
+                    class:list={[
+                      'size-4 shrink-0 self-center text-ink-muted transition-all duration-300 group-hover:translate-x-1',
+                      tokens.hoverText,
+                    ]}
+                  />
+                </article>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  )
+}

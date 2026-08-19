@@ -1,0 +1,133 @@
+---
+import { Image } from 'astro:assets';
+
+import { SITE } from '../../config/site.mjs';
+import Icon from '../primitives/Icon.astro';
+import { VISIBLE_AREAS } from '../../lib/accents';
+import logoEnd from '../../assets/institutional/logo-end.jpg';
+
+interface FooterLink {
+  href: string;
+  label: string;
+  external?: boolean;
+}
+
+const SECTIONS: { title: string; links: FooterLink[] }[] = [
+  {
+    title: 'La plataforma',
+    links: [
+      ...VISIBLE_AREAS.map((area) => ({ href: area.href, label: area.label })),
+      { href: '/capacitacion/', label: 'Plan de capacitación' },
+      { href: '/buscar/', label: 'Buscar' },
+    ],
+  },
+  {
+    title: 'Portal institucional',
+    links: [
+      { href: SITE.portal.url, label: 'endeporte.edu.co', external: true },
+      {
+        href: 'https://endeporte.edu.co/publicaciones/106/convocatorias-docente/',
+        label: 'Convocatorias docentes',
+        external: true,
+      },
+      {
+        href: 'https://endeporte.edu.co/publicaciones/121/transparencia-y-acceso-a-informacion-publica/',
+        label: 'Transparencia',
+        external: true,
+      },
+      {
+        href: 'https://endeporte.edu.co/2501',
+        label: 'Contáctenos',
+        external: true,
+      },
+    ],
+  },
+];
+
+const year = new Date().getFullYear();
+---
+
+<footer class="on-dark bg-end-950 text-white">
+  <!-- Los tres colores cierran la página igual que abren la marca. -->
+  <div aria-hidden="true" class="flex h-1">
+    <span class="flex-1 bg-end-600"></span>
+    <span class="flex-1 bg-teal-500"></span>
+    <span class="flex-1 bg-clay-500"></span>
+  </div>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-16 sm:px-8">
+    <div class="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
+      <div>
+        <p class="font-display text-2xl font-extrabold tracking-tight text-white">
+          Caja de Herramientas
+        </p>
+        <p class="mt-4 max-w-sm leading-relaxed text-white/70">
+          Espacio digital de apoyo al docente de la {SITE.institutionShort}.
+          Recursos, tutoriales de END Digital y contenidos institucionales en un
+          solo lugar.
+        </p>
+
+        <!-- El logotipo oficial va sobre su fondo blanco original:
+             no se recolorea ni se recorta. -->
+        <div class="mt-8 inline-block rounded-card bg-white p-4">
+          <Image
+            src={logoEnd}
+            alt={SITE.institution}
+            width={260}
+            densities={[1, 2]}
+            loading="lazy"
+            class="h-auto w-[200px]"
+          />
+        </div>
+      </div>
+
+      {
+        SECTIONS.map((section) => (
+          <nav aria-labelledby={`footer-${section.title.replace(/\s+/g, '-')}`}>
+            <h2
+              id={`footer-${section.title.replace(/\s+/g, '-')}`}
+              class="eyebrow text-white/50"
+            >
+              {section.title}
+            </h2>
+            <ul class="mt-5 space-y-3">
+              {section.links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="link-underline inline-flex items-center gap-1.5 text-white/85 transition-colors hover:text-white"
+                    {...(link.external
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {})}
+                  >
+                    {link.label}
+                    {link.external && (
+                      <Icon name="external" class="size-3.5 opacity-60" />
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+    </div>
+
+    <div
+      class="mt-16 flex flex-col gap-4 border-t border-white/15 pt-8 text-sm text-white/60 sm:flex-row sm:items-start sm:justify-between"
+    >
+      <p>© {year} {SITE.institution}</p>
+      <p class="max-w-md sm:text-right">
+        Los contenidos institucionales provienen del
+        <a
+          href={SITE.portal.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-semibold text-white underline underline-offset-4 decoration-teal-400 hover:decoration-2"
+        >
+          portal oficial de la END
+        </a>, que sigue siendo la fuente autorizada.
+      </p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,39 @@
+{
+  "topic": "Diseña tus estrategias de formación mediadas por tecnologías",
+  "track": "moodle",
+  "categoryLabel": "LMS Moodle y su integración con la suite Google",
+  "tools": [
+    "Moodle",
+    "Google Workspace"
+  ],
+  "date": "2026-08-24",
+  "dateLabel": "Lunes 24 de agosto",
+  "groups": [
+    {
+      "label": "Primer grupo",
+      "start": "08:00",
+      "end": "10:00"
+    },
+    {
+      "label": "Segundo grupo",
+      "start": "10:00",
+      "end": "12:00"
+    },
+    {
+      "label": "Tercer grupo",
+      "start": "14:00",
+      "end": "16:00"
+    }
+  ],
+  "facilitators": [
+    "Duván Giraldo",
+    "Mario Alejandro Correa"
+  ],
+  "audience": "facultades",
+  "support": {
+    "start": "19:00",
+    "end": "20:00",
+    "host": "Julieth Mejía"
+  },
+  "order": 3
+}

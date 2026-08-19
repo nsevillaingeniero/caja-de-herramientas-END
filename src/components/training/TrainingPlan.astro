@@ -1,0 +1,223 @@
+---
+import Icon from '../primitives/Icon.astro';
+import TrainingCard from './TrainingCard.astro';
+import {
+  AUDIENCE_LABELS,
+  TRACK_LABELS,
+  isPastTraining,
+  type Training,
+} from '../../lib/content';
+
+/**
+ * El plan de capacitación, con filtros.
+ *
+ * Mismo principio que el catálogo: el servidor pinta todas las fichas
+ * y el filtrado solo las oculta, así que el plan se lee entero aunque
+ * el JavaScript falle.
+ */
+interface Props {
+  trainings: Training[];
+}
+
+const { trainings } = Astro.props;
+
+/** Solo se ofrecen filtros con sesiones detrás. */
+const tracks = [...new Set(trainings.map((t) => t.data.track))].map((track) => ({
+  track,
+  count: trainings.filter((t) => t.data.track === track).length,
+}));
+
+const audiences = [
+  ...new Set(trainings.map((t) => t.data.audience).filter(Boolean)),
+].map((audience) => ({
+  audience: audience as string,
+  count: trainings.filter((t) => t.data.audience === audience).length,
+}));
+
+const withRecording = trainings.filter((t) => t.data.recording).length;
+const pending = trainings.filter(
+  (t) => !t.data.recording && isPastTraining(t),
+).length;
+
+const chip =
+  'group inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200 ' +
+  'text-ink-soft ring-1 ring-inset ring-border-strong hover:ring-end-600 hover:text-end-800 ' +
+  'has-[:checked]:bg-end-700 has-[:checked]:text-white has-[:checked]:ring-end-700 ' +
+  'has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-teal-500';
+---
+
+<div data-training-plan>
+  <div class="flex flex-wrap items-end justify-between gap-6">
+    <fieldset>
+      <legend class="eyebrow text-ink-muted">Línea de formación</legend>
+      <div class="mt-4 flex flex-wrap gap-2.5">
+        {
+          tracks.map(({ track, count }) => (
+            <label class={chip}>
+              <input type="checkbox" name="linea" value={track} class="sr-only" />
+              {TRACK_LABELS[track]}
+              <span class="tabular text-xs opacity-60">{count}</span>
+            </label>
+          ))
+        }
+
+        {
+          audiences.map(({ audience, count }) => (
+            <label class={chip}>
+              <input
+                type="checkbox"
+                name="convocatoria"
+                value={audience}
+                class="sr-only"
+              />
+              {AUDIENCE_LABELS[audience]}
+              <span class="tabular text-xs opacity-60">{count}</span>
+            </label>
+          ))
+        }
+
+        {/* El filtro que gana sentido a medida que se publiquen las
+            grabaciones. Se ofrece solo cuando hay alguna. */}
+        {
+          withRecording > 0 && (
+            <label
+              class={chip.replace(
+                'has-[:checked]:bg-end-700 has-[:checked]:ring-end-700',
+                'has-[:checked]:bg-teal-700 has-[:checked]:ring-teal-700',
+              )}
+            >
+              <input
+                type="checkbox"
+                name="grabacion"
+                value="si"
+                class="sr-only"
+              />
+              <Icon name="circle-play" class="size-4 opacity-70" />
+              Con grabación
+              <span class="tabular text-xs opacity-60">{withRecording}</span>
+            </label>
+          )
+        }
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="mt-8 flex flex-wrap items-center justify-between gap-4">
+    <p class="text-sm text-ink-muted">
+      <span data-result-count class="tabular font-bold text-end-900">
+        {trainings.length}
+      </span>{' '}
+      <span data-result-noun>
+        {trainings.length === 1 ? 'sesión' : 'sesiones'}
+      </span>
+      {
+        pending > 0 && (
+          <>
+            <span aria-hidden="true"> · </span>
+            <span class="tabular">{pending}</span> con grabación pendiente
+          </>
+        )
+      }
+    </p>
+
+    <button
+      type="button"
+      data-filter-clear
+      class="hidden text-sm font-semibold text-end-700 underline underline-offset-4 hover:text-end-800"
+    >
+      Limpiar filtros
+    </button>
+  </div>
+
+  <ul data-training-grid class="mt-6 grid gap-5 lg:grid-cols-2 lg:gap-6">
+    {
+      trainings.map((training, index) => (
+        <li
+          data-item
+          data-linea={training.data.track}
+          data-convocatoria={training.data.audience ?? ''}
+          data-grabacion={training.data.recording ? 'si' : 'no'}
+          class="reveal"
+        >
+          <TrainingCard training={training} index={index + 1} class="h-full" />
+        </li>
+      ))
+    }
+  </ul>
+
+  <div data-empty class="hidden rounded-panel bg-paper px-6 py-20 text-center">
+    <p class="font-display text-xl font-extrabold text-end-900">
+      Ninguna sesión coincide
+    </p>
+    <p class="mx-auto mt-3 max-w-sm text-ink-soft">
+      Quita algún filtro para ver el plan completo.
+    </p>
+    <button
+      type="button"
+      data-filter-clear
+      class="mt-7 rounded-control bg-end-600 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-end-700"
+    >
+      Limpiar filtros
+    </button>
+  </div>
+</div>
+
+<script>
+  /** Filtrado del plan: dentro de un grupo la lógica es O; entre grupos, Y. */
+  const root = document.querySelector<HTMLElement>('[data-training-plan]');
+
+  if (root) {
+    const items = Array.from(root.querySelectorAll<HTMLElement>('[data-item]'));
+    const grid = root.querySelector<HTMLElement>('[data-training-grid]');
+    const empty = root.querySelector<HTMLElement>('[data-empty]');
+    const countEl = root.querySelector('[data-result-count]');
+    const nounEl = root.querySelector('[data-result-noun]');
+    const clears = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-filter-clear]'),
+    );
+    const boxes = Array.from(
+      root.querySelectorAll<HTMLInputElement>('input[type="checkbox"]'),
+    );
+
+    const selected = (name: string) =>
+      boxes.filter((box) => box.name === name && box.checked).map((b) => b.value);
+
+    function apply() {
+      const lineas = selected('linea');
+      const convocatorias = selected('convocatoria');
+      const grabacion = selected('grabacion');
+      const active = lineas.length + convocatorias.length + grabacion.length;
+
+      let visible = 0;
+
+      for (const item of items) {
+        const matches =
+          (lineas.length === 0 || lineas.includes(item.dataset.linea ?? '')) &&
+          (convocatorias.length === 0 ||
+            convocatorias.includes(item.dataset.convocatoria ?? '')) &&
+          (grabacion.length === 0 || item.dataset.grabacion === 'si');
+
+        item.hidden = !matches;
+        if (matches) visible += 1;
+      }
+
+      if (countEl) countEl.textContent = String(visible);
+      if (nounEl) nounEl.textContent = visible === 1 ? 'sesión' : 'sesiones';
+      if (empty) empty.classList.toggle('hidden', visible > 0);
+      if (grid) grid.hidden = visible === 0;
+      clears.forEach((c) => c.classList.toggle('hidden', active === 0));
+    }
+
+    boxes.forEach((box) => box.addEventListener('change', apply));
+    clears.forEach((button) =>
+      button.addEventListener('click', () => {
+        boxes.forEach((box) => {
+          box.checked = false;
+        });
+        apply();
+      }),
+    );
+
+    apply();
+  }
+</script>

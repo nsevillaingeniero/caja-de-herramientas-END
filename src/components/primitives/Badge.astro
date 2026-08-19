@@ -1,0 +1,45 @@
+---
+import Icon from './Icon.astro';
+
+/**
+ * Etiqueta de metadato (precio, nivel, integración…).
+ *
+ * Rectangular y en versalita: se lee como una anotación editorial y
+ * no como una píldora de interfaz. El color nunca es el único
+ * portador de significado — el texto siempre está.
+ */
+interface Props {
+  variant?: 'end' | 'teal' | 'clay' | 'slate' | 'outline' | 'dark';
+  icon?: string;
+  size?: 'sm' | 'md';
+  class?: string;
+}
+
+const {
+  variant = 'slate',
+  icon,
+  size = 'md',
+  class: className = '',
+} = Astro.props;
+
+const variants: Record<string, string> = {
+  end: 'bg-end-50 text-end-800',
+  teal: 'bg-teal-50 text-teal-800',
+  clay: 'bg-clay-50 text-clay-800',
+  slate: 'bg-paper-deep text-ink-soft',
+  outline: 'text-ink-soft ring-1 ring-inset ring-border-strong',
+  dark: 'bg-white/12 text-white',
+};
+
+const sizes: Record<string, string> = {
+  sm: 'text-[11px] px-1.5 py-0.5 gap-1',
+  md: 'text-xs px-2 py-1 gap-1.5',
+};
+---
+
+<span
+  class={`inline-flex items-center rounded-[3px] font-semibold tracking-wide whitespace-nowrap ${variants[variant]} ${sizes[size]} ${className}`}
+>
+  {icon && <Icon name={icon} class="size-3.5 shrink-0" />}
+  <slot />
+</span>

@@ -1,0 +1,246 @@
+---
+import Icon from '../primitives/Icon.astro';
+import { accent as accentStyles } from '../../lib/accents';
+import { getIntentSummaries } from '../../lib/relations';
+
+/**
+ * "¿Qué quieres hacer?"
+ *
+ * El docente entra por su necesidad, no por la sección donde vive la
+ * respuesta. Se resuelve como un navegador de dos paneles: a la
+ * izquierda las seis necesidades numeradas; a la derecha, una vista
+ * previa que cambia al recorrerlas con el cursor o con el teclado.
+ *
+ * La vista previa no lleva fotografía: no existe una imagen real que
+ * represente "evaluar" sin ser decorativa. Lleva una composición de
+ * color del área, el icono lineal y las cifras verdaderas de lo que
+ * hay detrás de esa necesidad.
+ */
+const summaries = await getIntentSummaries();
+
+/** "5 recursos · 2 tutoriales", omitiendo lo que esté vacío. */
+function describe(resources: number, tutorials: number): string {
+  const parts: string[] = [];
+  if (resources > 0)
+    parts.push(`${resources} ${resources === 1 ? 'recurso' : 'recursos'}`);
+  if (tutorials > 0)
+    parts.push(`${tutorials} ${tutorials === 1 ? 'tutorial' : 'tutoriales'}`);
+  return parts.join(' · ');
+}
+
+/** Degradado de la vista previa, por acento de área. */
+/**
+ * Degradado de la vista previa, por acento de área. Los tres parten
+ * de su color y aterrizan en el azul profundo de la marca: la vista
+ * cambia de temperatura sin salirse de la paleta.
+ */
+const PREVIEW_GRADIENT: Record<string, string> = {
+  end: 'from-end-500 via-end-700 to-end-950',
+  teal: 'from-teal-500 via-teal-700 to-end-950',
+  clay: 'from-clay-500 via-clay-700 to-end-950',
+  slate: 'from-end-700 via-end-800 to-end-950',
+};
+---
+
+<section
+  aria-labelledby="intents-title"
+  class="relative isolate overflow-hidden bg-paper py-20 lg:py-28"
+  data-intent-nav
+>
+  <div aria-hidden="true" class="absolute inset-0 -z-10">
+    <span class="orb animate-drift-slow -top-32 right-[8%] size-[26rem] bg-end-200/70"></span>
+    <span class="orb animate-drift bottom-[-8rem] left-[-6rem] size-[22rem] bg-teal-200/60"></span>
+  </div>
+
+  <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
+    <div class="max-w-2xl">
+      <p class="eyebrow text-teal-700">Navega por necesidad</p>
+      <h2
+        id="intents-title"
+        class="mt-4 font-display text-title font-extrabold text-end-950"
+      >
+        ¿Qué quieres hacer?
+      </h2>
+      <p class="mt-5 text-lg leading-relaxed text-ink-soft">
+        Empieza por tu necesidad. Te llevamos a las herramientas y tutoriales
+        que la resuelven, sin que tengas que saber en qué sección están.
+      </p>
+    </div>
+
+    <div class="mt-12 grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:gap-8">
+      {/* ── LISTA ────────────────────────────────────────────── */}
+      <ul
+        class="reveal overflow-hidden rounded-panel bg-white p-2 shadow-float ring-1 ring-border sm:p-3"
+      >
+        {
+          summaries.map(({ intent, resources, tutorials }, index) => {
+            const tokens = accentStyles(intent.data.accent);
+            const count = describe(resources, tutorials);
+
+            return (
+              <li>
+                <a
+                  href={`/necesito/${intent.id}/`}
+                  data-intent-row
+                  data-target={intent.id}
+                  class="group relative flex items-center gap-4 overflow-hidden rounded-card px-3 py-4 transition-colors duration-300 max-lg:items-start hover:bg-paper focus-visible:bg-paper data-[active]:bg-paper sm:gap-6 sm:px-5 sm:py-5"
+                >
+                  {/* Indicador lateral: crece cuando la fila está activa. */}
+                  <span
+                    aria-hidden="true"
+                    class:list={[
+                      'absolute top-1/2 left-0 h-0 w-1 -translate-y-1/2 rounded-r-full transition-all duration-400 ease-out-soft group-hover:h-3/5 group-data-[active]:h-3/5',
+                      tokens.rule,
+                    ]}
+                  />
+
+                  <span
+                    aria-hidden="true"
+                    class:list={[
+                      'tabular w-7 shrink-0 font-display text-sm font-bold text-ink-muted transition-all duration-300 max-lg:mt-1.5 group-hover:translate-x-1.5 group-data-[active]:translate-x-1.5 sm:w-9',
+                      tokens.hoverText,
+                    ]}
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+
+                  <span class="min-w-0 flex-1">
+                    <span class="block font-display text-row font-bold text-end-950">
+                      {intent.data.label}
+                    </span>
+                    <span class="mt-1.5 block text-[0.9375rem] leading-relaxed text-ink-soft lg:hidden">
+                      {intent.data.description}
+                    </span>
+                  </span>
+
+                  {count && (
+                    <span class="tabular hidden shrink-0 text-sm text-ink-muted sm:block">
+                      {count}
+                    </span>
+                  )}
+
+                  <span
+                    class:list={[
+                      'grid size-9 shrink-0 place-items-center rounded-full text-ink-muted transition-all duration-300 group-hover:translate-x-1 group-data-[active]:translate-x-1',
+                      tokens.hoverTint,
+                      tokens.hoverText,
+                    ]}
+                  >
+                    <Icon name="arrow" class="size-4" />
+                  </span>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+
+      {/* ── VISTA PREVIA ──────────────────────────────────────
+          Todas las vistas se renderizan; solo una es visible. No
+          hay peticiones al cambiar de fila. Se oculta en móvil,
+          donde cada fila ya muestra su descripción. */}
+      <div class="reveal hidden lg:block">
+        <div class="sticky top-28">
+          <div
+            class="relative aspect-4/5 overflow-hidden rounded-panel shadow-lift"
+          >
+            {
+              summaries.map(({ intent, resources, tutorials }, index) => {
+                const gradient =
+                  PREVIEW_GRADIENT[intent.data.accent] ?? PREVIEW_GRADIENT.end;
+
+                return (
+                  <article
+                    data-intent-preview
+                    data-id={intent.id}
+                    aria-hidden="true"
+                    class:list={[
+                      'absolute inset-0 flex flex-col justify-end bg-linear-to-br p-7 text-white transition-all duration-500 ease-out-soft',
+                      gradient,
+                      index === 0
+                        ? 'opacity-100'
+                        : 'pointer-events-none scale-[1.03] opacity-0',
+                    ]}
+                  >
+                    <div class="dot-grid-dark absolute inset-0 opacity-50" />
+                    <span class="orb animate-drift-slow -top-16 -right-10 size-56 bg-white/25" />
+
+                    {/* El número enlaza la vista con su fila en la
+                        lista: se ve cuál de las seis está señalada. */}
+                    <span
+                      aria-hidden="true"
+                      class="tabular absolute top-5 left-6 font-display text-[7rem] leading-none font-extrabold text-white/12"
+                    >
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+
+                    <Icon
+                      name={intent.data.icon}
+                      class="relative size-11 text-white/90"
+                    />
+
+                    <p class="relative mt-6 font-display text-2xl leading-tight font-extrabold text-white">
+                      {intent.data.label}
+                    </p>
+
+                    <p class="relative mt-3 leading-relaxed text-white/80">
+                      {intent.data.description}
+                    </p>
+
+                    <p class="relative mt-6 flex items-center gap-3 border-t border-white/20 pt-5 text-sm font-semibold text-white/90">
+                      <span class="tabular">
+                        {describe(resources, tutorials) || 'En construcción'}
+                      </span>
+                      <Icon name="arrow" class="ml-auto size-4" />
+                    </p>
+                  </article>
+                );
+              })
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  /**
+   * Sincroniza la fila señalada con su vista previa.
+   *
+   * Se activa con el cursor y con el teclado (foco), de modo que la
+   * información de la vista previa no es exclusiva del ratón. Si el
+   * script no corre, la primera vista queda visible y las filas
+   * siguen siendo enlaces normales.
+   */
+  document.querySelectorAll<HTMLElement>('[data-intent-nav]').forEach((nav) => {
+    const rows = nav.querySelectorAll<HTMLElement>('[data-intent-row]');
+    const previews = nav.querySelectorAll<HTMLElement>('[data-intent-preview]');
+
+    if (rows.length === 0 || previews.length === 0) return;
+
+    const activate = (id: string) => {
+      rows.forEach((row) => {
+        row.toggleAttribute('data-active', row.dataset.target === id);
+      });
+
+      previews.forEach((preview) => {
+        const on = preview.dataset.id === id;
+        preview.classList.toggle('opacity-0', !on);
+        preview.classList.toggle('scale-[1.03]', !on);
+        preview.classList.toggle('pointer-events-none', !on);
+        preview.classList.toggle('opacity-100', on);
+      });
+    };
+
+    rows.forEach((row) => {
+      const id = row.dataset.target;
+      if (!id) return;
+
+      row.addEventListener('mouseenter', () => activate(id));
+      row.addEventListener('focus', () => activate(id));
+    });
+
+    activate(rows[0].dataset.target ?? '');
+  });
+</script>

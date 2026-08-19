@@ -1,0 +1,24 @@
+{
+  "name": "Genially",
+  "shortDescription": "Contenidos visuales con capas interactivas: presentaciones, imágenes navegables y escape rooms educativos.",
+  "description": "Genially permite crear piezas visuales donde el usuario hace clic y descubre información por capas: presentaciones no lineales, infografías interactivas, mapas navegables y juegos de escape.\n\nSu fuerte es la narrativa: en vez de entregar todo el contenido de golpe, puedes dosificarlo y hacer que el estudiante lo explore. Requiere algo más de tiempo de preparación que una presentación tradicional, pero el resultado sostiene mucho mejor la atención.",
+  "activities": [
+    "Presentaciones interactivas no lineales",
+    "Infografías con capas de información",
+    "Escape rooms y retos educativos",
+    "Imágenes y mapas navegables",
+    "Guías visuales de estudio"
+  ],
+  "modality": "web",
+  "pricing": "freemium",
+  "pricingNote": "El plan gratuito mantiene las creaciones públicas y muestra la marca de Genially.",
+  "categories": ["creacion-de-contenidos", "actividades-interactivas"],
+  "moodleIntegration": "embed",
+  "moodleUsage": "Genera el código de inserción en Genially y pégalo en una «Página» del curso mediante el editor HTML. Así el contenido se ve dentro de END Digital.",
+  "languages": ["Español", "Inglés"],
+  "url": "https://genially.com",
+  "intents": ["crear-contenidos", "crear-actividad"],
+  "tags": ["interactivo", "diseño", "gamificación", "presentación"],
+  "featured": false,
+  "order": 7
+}

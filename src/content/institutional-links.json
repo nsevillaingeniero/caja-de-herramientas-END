@@ -1,0 +1,167 @@
+[
+  {
+    "id": "convocatorias-docentes",
+    "label": "Convocatorias y evaluación docente",
+    "description": "Convocatorias vigentes y el proceso de evaluación docente de la institución.",
+    "url": "https://endeporte.edu.co/publicaciones/106/convocatorias-docente/",
+    "group": "docencia",
+    "icon": "megaphone",
+    "order": 1
+  },
+  {
+    "id": "aseguramiento-calidad",
+    "label": "Unidad de Aseguramiento de la Calidad",
+    "description": "Acreditación, autoevaluación y procesos de calidad académica.",
+    "url": "https://endeporte.edu.co/2656",
+    "group": "docencia",
+    "icon": "shield-check",
+    "order": 2
+  },
+  {
+    "id": "programas-academicos",
+    "label": "Programas académicos",
+    "description": "Pregrados y posgrados que ofrece la Escuela Nacional del Deporte.",
+    "url": "https://endeporte.edu.co/2502",
+    "group": "docencia",
+    "icon": "graduation-cap",
+    "order": 3
+  },
+  {
+    "id": "directorio",
+    "label": "Directorio de funcionarios",
+    "description": "Dependencias, responsables y datos de contacto internos.",
+    "url": "https://endeporte.edu.co/publicaciones/2575/directorio-de-funcionarios-escuela-nacional-del-deporte/",
+    "group": "docencia",
+    "icon": "users",
+    "order": 4
+  },
+  {
+    "id": "encuestas-institucionales",
+    "label": "Encuestas institucionales",
+    "description": "Instrumentos que la institución aplica a la comunidad académica.",
+    "url": "https://endeporte.edu.co/publicaciones/2609/encuestas-institucionales/",
+    "group": "docencia",
+    "icon": "chart-bar",
+    "order": 5
+  },
+
+  {
+    "id": "normatividad",
+    "label": "Normatividad",
+    "description": "Normograma institucional, leyes y decretos que rigen a la END.",
+    "url": "https://endeporte.edu.co/2627",
+    "group": "normativa",
+    "icon": "scale",
+    "order": 1
+  },
+  {
+    "id": "codigo-buen-gobierno",
+    "label": "Código de Buen Gobierno",
+    "description": "Principios y compromisos que orientan la actuación institucional.",
+    "url": "https://endeporte.edu.co/publicaciones/13/codigo-de-buen-gobierno/",
+    "group": "normativa",
+    "icon": "file-text",
+    "order": 2
+  },
+  {
+    "id": "organigrama",
+    "label": "Organigrama",
+    "description": "Estructura de la institución y relación entre sus dependencias.",
+    "url": "https://endeporte.edu.co/11",
+    "group": "normativa",
+    "icon": "building",
+    "order": 3
+  },
+  {
+    "id": "consejo-directivo",
+    "label": "Consejo Directivo",
+    "description": "Composición del máximo órgano de dirección de la institución.",
+    "url": "https://endeporte.edu.co/27",
+    "group": "normativa",
+    "icon": "users",
+    "order": 4
+  },
+  {
+    "id": "mision-vision",
+    "label": "Misión y visión",
+    "description": "El propósito institucional que enmarca la labor docente.",
+    "url": "https://endeporte.edu.co/1",
+    "group": "normativa",
+    "icon": "compass",
+    "order": 5
+  },
+  {
+    "id": "accesibilidad-inclusion",
+    "label": "Accesibilidad e inclusión",
+    "description": "Lineamientos institucionales de accesibilidad e inclusión.",
+    "url": "https://endeporte.edu.co/publicaciones/2548/accesibilidad-e-inclusion/",
+    "group": "normativa",
+    "icon": "accessibility",
+    "order": 6
+  },
+
+  {
+    "id": "tramites",
+    "label": "Trámites",
+    "description": "Trámites y servicios que se gestionan ante la institución.",
+    "url": "https://endeporte.edu.co/tramites",
+    "group": "servicios",
+    "icon": "list-checks",
+    "order": 1
+  },
+  {
+    "id": "pqrsd",
+    "label": "PQRSD",
+    "description": "Peticiones, quejas, reclamos, sugerencias, denuncias y felicitaciones.",
+    "url": "https://endeporte.edu.co/67",
+    "group": "servicios",
+    "icon": "message-circle",
+    "order": 2
+  },
+  {
+    "id": "contacto",
+    "label": "Contáctenos",
+    "description": "Sedes, teléfonos y canales oficiales de atención.",
+    "url": "https://endeporte.edu.co/2501",
+    "group": "servicios",
+    "icon": "phone",
+    "order": 3
+  },
+  {
+    "id": "portafolio-servicios",
+    "label": "Portafolio de servicios",
+    "description": "Servicios que la institución presta a la comunidad y a terceros.",
+    "url": "https://endeporte.edu.co/3504",
+    "group": "servicios",
+    "icon": "library",
+    "order": 4
+  },
+  {
+    "id": "manual-atencion",
+    "label": "Manual de Atención y Servicio al Ciudadano",
+    "description": "Documento con los protocolos de atención de la institución.",
+    "url": "https://endeporte.edu.co/documentos/419/manual-de-atencion-y-servicio-al-ciudadano/",
+    "group": "servicios",
+    "icon": "file-text",
+    "kind": "documento",
+    "order": 5
+  },
+  {
+    "id": "glosario",
+    "label": "Glosario",
+    "description": "Términos institucionales y del sector con su definición oficial.",
+    "url": "https://endeporte.edu.co/glosario",
+    "group": "servicios",
+    "icon": "book",
+    "order": 6
+  },
+  {
+    "id": "galeria-multimedia",
+    "label": "Galería multimedia",
+    "description": "Fotografía y video institucional publicados por la END.",
+    "url": "https://endeporte.edu.co/2682",
+    "group": "servicios",
+    "icon": "video",
+    "order": 7
+  }
+]

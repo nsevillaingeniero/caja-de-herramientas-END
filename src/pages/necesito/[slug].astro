@@ -1,0 +1,170 @@
+---
+import type { GetStaticPaths } from 'astro';
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import SectionHeader from '../../components/shared/SectionHeader.astro';
+import ResourceCard from '../../components/resources/ResourceCard.astro';
+import TutorialRow from '../../components/tutorials/TutorialRow.astro';
+import Button from '../../components/primitives/Button.astro';
+import Icon from '../../components/primitives/Icon.astro';
+
+import { getCategories, getIntents, type Intent } from '../../lib/content';
+import { getByIntent } from '../../lib/relations';
+import { accent as accentStyles, type Accent } from '../../lib/accents';
+
+interface Props {
+  intent: Intent;
+}
+
+/**
+ * Resultados por necesidad.
+ *
+ * Es la ruta que sostiene el principio de la plataforma: el docente
+ * expresa qué quiere hacer y recibe herramientas y tutoriales juntos,
+ * sin tener que decidir primero en qué sección buscar.
+ */
+export const getStaticPaths: GetStaticPaths = async () => {
+  const intents = await getIntents();
+  return intents.map((intent) => ({
+    params: { slug: intent.id },
+    props: { intent },
+  }));
+};
+
+const { intent } = Astro.props;
+
+const [{ resources, tutorials }, categories, allIntents] = await Promise.all([
+  getByIntent(intent.id),
+  getCategories(),
+  getIntents(),
+]);
+
+const others = allIntents.filter((other) => other.id !== intent.id);
+const total = resources.length + tutorials.length;
+---
+
+<BaseLayout title={intent.data.label} description={intent.data.description}>
+  <PageHeader
+    eyebrow="¿Qué quieres hacer?"
+    title={intent.data.pageTitle}
+    description={intent.data.description}
+    accent={intent.data.accent as Accent}
+    tone="deep"
+    breadcrumbs={[{ href: '/', label: 'Inicio' }]}
+  >
+    <Icon
+      slot="aside"
+      name={intent.data.icon}
+      class="hidden size-20 shrink-0 text-white/25 lg:block"
+    />
+  </PageHeader>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-14 sm:px-8 lg:py-16">
+    {
+      total === 0 ? (
+        <div class="rounded-panel bg-paper px-6 py-20 text-center">
+          <p class="font-display text-xl font-extrabold text-end-900">
+            Todavía no hay contenidos para esta necesidad
+          </p>
+          <p class="mx-auto mt-3 max-w-md text-ink-soft">
+            Estamos ampliando la caja de herramientas. Mientras tanto, explora el
+            catálogo completo.
+          </p>
+          <div class="mt-7 flex justify-center">
+            <Button href="/recursos/">Ver todos los recursos</Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {tutorials.length > 0 && (
+            <section aria-labelledby="intent-tutoriales">
+              <SectionHeader
+                id="intent-tutoriales"
+                eyebrow="END Digital"
+                title="Aprende a hacerlo"
+                description="Tutoriales que te guían paso a paso dentro de tu aula virtual."
+                accent="teal"
+              />
+              <ul class="mt-9 border-t border-border">
+                {tutorials.map((tutorial, index) => (
+                  <li class="reveal border-b border-border">
+                    <TutorialRow tutorial={tutorial} index={index + 1} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {resources.length > 0 && (
+            <section
+              aria-labelledby="intent-recursos"
+              class:list={[tutorials.length > 0 && 'mt-20']}
+            >
+              <SectionHeader
+                id="intent-recursos"
+                eyebrow="Catálogo"
+                title="Herramientas que te sirven"
+                description="Recursos digitales para llevarlo a la práctica."
+                accent="end"
+              />
+              <ul class="mt-9 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {resources.map((resource) => (
+                  <li class="reveal">
+                    <ResourceCard
+                      resource={resource}
+                      categories={categories}
+                      class="h-full"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </>
+      )
+    }
+
+    <!-- Otras necesidades: mantiene abierta la exploración -->
+    <section aria-labelledby="otras" class="mt-20 border-t border-border-strong pt-12">
+      <h2 id="otras" class="font-display text-2xl font-extrabold text-end-900">
+        ¿Buscabas otra cosa?
+      </h2>
+
+      <ul class="mt-7 border-t border-border">
+        {
+          others.map((other) => {
+            const otherTone = accentStyles(other.data.accent);
+
+            return (
+              <li class="border-b border-border">
+                <a
+                  href={`/necesito/${other.id}/`}
+                  class="group flex items-center gap-4 py-4"
+                >
+                  <Icon
+                    name={other.data.icon}
+                    class:list={[
+                      'size-5 shrink-0 text-ink-muted transition-colors',
+                      otherTone.hoverText,
+                    ]}
+                  />
+                  <span class="font-display text-lg font-bold text-end-900">
+                    <span class="link-underline">{other.data.label}</span>
+                  </span>
+                  <Icon
+                    name="arrow"
+                    class:list={[
+                      'ml-auto size-4 shrink-0 text-ink-muted transition-all duration-300 group-hover:translate-x-1',
+                      otherTone.hoverText,
+                    ]}
+                  />
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

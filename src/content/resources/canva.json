@@ -1,0 +1,24 @@
+{
+  "name": "Canva",
+  "shortDescription": "Diseña presentaciones, infografías y material visual con buen acabado, sin saber diseño gráfico.",
+  "description": "Canva es un editor gráfico en el navegador basado en plantillas. Permite producir presentaciones, infografías, carteles, documentos y video corto con un resultado profesional partiendo de diseños ya armados.\n\nPara docentes tiene un atractivo concreto: Canva ofrece un plan educativo gratuito para profesores de instituciones certificadas, que desbloquea la biblioteca completa de elementos y funciones de trabajo colaborativo. Es la vía más rápida para elevar la calidad visual de tus materiales de clase.",
+  "activities": [
+    "Presentaciones de clase",
+    "Infografías y material de apoyo",
+    "Carteles y piezas para comunicar",
+    "Documentos y guías con diseño cuidado",
+    "Video corto y animaciones sencillas"
+  ],
+  "modality": "multiplataforma",
+  "pricing": "freemium",
+  "pricingNote": "Canva para Educación es gratuito para docentes verificados de instituciones elegibles.",
+  "categories": ["creacion-de-contenidos", "recursos-educativos"],
+  "moodleIntegration": "embed",
+  "moodleUsage": "Publica el diseño en Canva, copia el código de inserción y pégalo en una «Página» de tu curso usando el editor en modo HTML. También puedes exportar a PDF y subirlo como recurso.",
+  "languages": ["Español", "Inglés"],
+  "url": "https://www.canva.com/education/",
+  "intents": ["crear-contenidos"],
+  "tags": ["diseño", "presentación", "infografía", "visual"],
+  "featured": true,
+  "order": 2
+}

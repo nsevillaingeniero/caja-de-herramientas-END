@@ -1,0 +1,23 @@
+{
+  "name": "Audacity",
+  "shortDescription": "Editor de audio libre para grabar explicaciones, podcasts y material sonoro accesible.",
+  "description": "Audacity es un editor de audio de código abierto que se instala en el computador. Permite grabar, cortar, limpiar ruido y exportar audio en formatos estándar.\n\nEn docencia sirve para grabar explicaciones breves que acompañen una lectura, producir podcast como trabajo de los estudiantes, o generar versiones sonoras de materiales escritos —lo que aporta directamente a la accesibilidad del curso para estudiantes con dificultades de lectura o baja visión.",
+  "activities": [
+    "Grabación de explicaciones breves",
+    "Podcasts como producto de aprendizaje",
+    "Versiones en audio de materiales escritos",
+    "Limpieza y edición de grabaciones de clase"
+  ],
+  "modality": "escritorio",
+  "pricing": "gratis",
+  "pricingNote": "Software libre y de código abierto.",
+  "categories": ["creacion-de-contenidos", "accesibilidad-e-inclusion"],
+  "moodleIntegration": "enlace",
+  "moodleUsage": "Exporta el audio en MP3 y súbelo al curso como recurso «Archivo», o incrústalo en una «Página» para que se reproduzca sin descargar.",
+  "languages": ["Español", "Inglés"],
+  "url": "https://www.audacityteam.org",
+  "intents": ["crear-contenidos"],
+  "tags": ["audio", "podcast", "accesibilidad", "grabación"],
+  "featured": false,
+  "order": 9
+}

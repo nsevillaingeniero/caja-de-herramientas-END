@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import ResourceExplorer from '../../components/resources/ResourceExplorer.astro';
+
+import { getCategories, getResources } from '../../lib/content';
+
+const [resources, categories] = await Promise.all([
+  getResources(),
+  getCategories(),
+]);
+---
+
+<BaseLayout
+  title="Recursos"
+  description="Catálogo de herramientas digitales para enriquecer tus clases: inteligencia artificial, creación de contenidos, actividades interactivas, evaluación y más."
+>
+  <PageHeader
+    eyebrow="Catálogo"
+    title="Recursos para tus clases"
+    description="Herramientas digitales seleccionadas para docentes. Cada una indica qué permite crear, cuánto cuesta y cómo se integra en END Digital."
+    accent="end"
+    tone="deep"
+    breadcrumbs={[{ href: '/', label: 'Inicio' }]}
+  >
+    <p
+      slot="aside"
+      class="tabular shrink-0 font-display text-5xl font-extrabold text-end-300"
+    >
+      {resources.length}
+      <span class="mt-1 block text-sm font-semibold tracking-wide text-white/60">
+        herramientas
+      </span>
+    </p>
+  </PageHeader>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-14 sm:px-8 lg:py-16">
+    <ResourceExplorer resources={resources} categories={categories} />
+  </div>
+</BaseLayout>

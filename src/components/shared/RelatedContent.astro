@@ -1,0 +1,82 @@
+---
+import Icon from '../primitives/Icon.astro';
+import type { RelatedItem } from '../../lib/relations';
+
+/**
+ * "También te puede interesar".
+ *
+ * Mezcla tipos de contenido a propósito: es el mecanismo por el que
+ * un docente que llega buscando un tutorial descubre las herramientas
+ * que lo complementan, y viceversa. El color de cada fila dice de qué
+ * área viene sin que haya que leer la etiqueta.
+ */
+interface Props {
+  items: RelatedItem[];
+  title?: string;
+}
+
+const { items, title = 'También te puede interesar' } = Astro.props;
+
+const TYPE_META: Record<
+  string,
+  { label: string; rule: string; text: string; hover: string }
+> = {
+  resource: {
+    label: 'Recurso',
+    rule: 'bg-end-600',
+    text: 'text-end-700',
+    hover: 'group-hover:text-end-700',
+  },
+  tutorial: {
+    label: 'END Digital',
+    rule: 'bg-teal-500',
+    text: 'text-teal-700',
+    hover: 'group-hover:text-teal-700',
+  },
+};
+---
+
+{
+  items.length > 0 && (
+    <section aria-labelledby="relacionados" class="mt-16 border-t border-border pt-12">
+      <h2 id="relacionados" class="font-display text-2xl font-extrabold text-end-900">
+        {title}
+      </h2>
+
+      <ul class="mt-7 border-t border-border">
+        {items.map((item) => {
+          const meta = TYPE_META[item.type];
+
+          return (
+            <li class="border-b border-border">
+              <a href={item.href} class="group flex items-start gap-5 py-5">
+                <span
+                  aria-hidden="true"
+                  class={`mt-1.5 h-9 w-[3px] shrink-0 rounded-full ${meta.rule}`}
+                />
+
+                <span class="min-w-0 flex-1">
+                  <span class={`eyebrow ${meta.text}`}>{meta.label}</span>
+                  <span class="mt-2 block font-display text-lg leading-snug font-bold text-end-900">
+                    <span class="link-underline">{item.title}</span>
+                  </span>
+                  <span class="mt-1.5 line-clamp-2 block text-[0.9375rem] leading-relaxed text-ink-soft">
+                    {item.description}
+                  </span>
+                </span>
+
+                <Icon
+                  name="arrow"
+                  class:list={[
+                    'mt-2 size-4 shrink-0 text-ink-muted transition-all duration-300 group-hover:translate-x-1',
+                    meta.hover,
+                  ]}
+                />
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  )
+}

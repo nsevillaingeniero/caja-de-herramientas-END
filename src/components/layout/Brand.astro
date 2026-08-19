@@ -1,0 +1,57 @@
+---
+import { SITE } from '../../config/site.mjs';
+
+/**
+ * Marca de la plataforma.
+ *
+ * No es un logotipo de la institución: el logotipo oficial de la END
+ * se usa tal cual en el pie. Aquí la identidad la sostiene la
+ * tipografía, acompañada de tres filetes que son los tres colores de
+ * las tres áreas —Recursos, END Digital, Para docentes— y que al
+ * mismo tiempo recogen el gesto de tres franjas del escudo END.
+ */
+interface Props {
+  /** En oscuro se invierte el color del texto, no el de los filetes. */
+  onDark?: boolean;
+  class?: string;
+}
+
+const { onDark = false, class: className = '' } = Astro.props;
+---
+
+<a
+  href="/"
+  class={`group flex shrink-0 items-center gap-3 ${className}`}
+  aria-label={`${SITE.name} — ir al inicio`}
+>
+  <span aria-hidden="true" class="flex flex-col gap-[3px] pt-0.5">
+    <span
+      class="block h-[3px] w-6 rounded-full bg-end-600 transition-all duration-300 group-hover:w-7"
+    ></span>
+    <span
+      class="block h-[3px] w-7 rounded-full bg-teal-500 transition-all duration-300 group-hover:w-5"
+    ></span>
+    <span
+      class="block h-[3px] w-4 rounded-full bg-clay-500 transition-all duration-300 group-hover:w-7"
+    ></span>
+  </span>
+
+  <span class="leading-none">
+    <span
+      class:list={[
+        'block font-display text-[0.9375rem] font-extrabold tracking-tight',
+        onDark ? 'text-white' : 'text-end-900',
+      ]}
+    >
+      Caja de Herramientas
+    </span>
+    <span
+      class:list={[
+        'mt-1 block text-[0.6875rem] font-medium tracking-wide',
+        onDark ? 'text-white/70' : 'text-ink-muted',
+      ]}
+    >
+      {SITE.institutionShort}
+    </span>
+  </span>
+</a>

@@ -1,0 +1,14 @@
+{
+  "topic": "Estrategias didácticas digitales con recursos interactivos",
+  "track": "recursos-digitales",
+  "categoryLabel": "Recursos educativos digitales",
+  "date": "2026-08-28",
+  "dateLabel": "Viernes 28 de agosto",
+  "groups": [
+    { "start": "10:00", "end": "12:00" },
+    { "start": "17:00", "end": "19:00" }
+  ],
+  "facilitators": ["Julieth Mejía", "Nicolás Sevilla"],
+  "audience": "abierta",
+  "order": 5
+}

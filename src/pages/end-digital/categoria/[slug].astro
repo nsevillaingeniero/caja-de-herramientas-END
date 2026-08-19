@@ -1,0 +1,86 @@
+---
+import type { GetStaticPaths } from 'astro';
+
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHeader from '../../../components/shared/PageHeader.astro';
+import TutorialRow from '../../../components/tutorials/TutorialRow.astro';
+
+import {
+  formatDuration,
+  getCategories,
+  getTutorials,
+  getTutorialsByCategory,
+  type Category,
+} from '../../../lib/content';
+
+interface Props {
+  category: Category;
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const [categories, tutorials] = await Promise.all([
+    getCategories('tutorial'),
+    getTutorials(),
+  ]);
+
+  return categories
+    .filter((category) =>
+      tutorials.some((tutorial) => tutorial.data.category.id === category.id),
+    )
+    .map((category) => ({
+      params: { slug: category.id },
+      props: { category },
+    }));
+};
+
+const { category } = Astro.props;
+
+const tutorials = await getTutorialsByCategory(category.id);
+
+const totalMinutes = tutorials.reduce((sum, t) => sum + t.data.duration, 0);
+---
+
+<BaseLayout title={category.data.name} description={category.data.description}>
+  <PageHeader
+    eyebrow="Ruta de aprendizaje"
+    title={category.data.name}
+    description={category.data.description}
+    accent="teal"
+    tone="deep"
+    breadcrumbs={[
+      { href: '/', label: 'Inicio' },
+      { href: '/end-digital/', label: 'END Digital' },
+    ]}
+  >
+    <dl slot="aside" class="flex shrink-0 gap-10">
+      <div>
+        <dd class="tabular font-display text-5xl font-extrabold text-teal-300">
+          {tutorials.length}
+        </dd>
+        <dt class="mt-1 text-sm font-semibold tracking-wide text-white/60">
+          {tutorials.length === 1 ? 'tutorial' : 'tutoriales'}
+        </dt>
+      </div>
+      <div>
+        <dd class="tabular font-display text-5xl font-extrabold text-teal-300">
+          {formatDuration(totalMinutes)}
+        </dd>
+        <dt class="mt-1 text-sm font-semibold tracking-wide text-white/60">
+          en total
+        </dt>
+      </div>
+    </dl>
+  </PageHeader>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-14 sm:px-8 lg:py-16">
+    <ul class="border-t border-border">
+      {
+        tutorials.map((tutorial, index) => (
+          <li class="reveal border-b border-border">
+            <TutorialRow tutorial={tutorial} index={index + 1} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>

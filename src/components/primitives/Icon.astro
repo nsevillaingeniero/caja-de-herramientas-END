@@ -1,0 +1,142 @@
+---
+/**
+ * Iconos Lucide.
+ *
+ * Los datos (categorías, intents, accesos) nombran su icono con una
+ * cadena; este registro es el único punto que traduce esa cadena a un
+ * componente. Añadir un icono nuevo = una línea aquí, sin tocar datos.
+ *
+ * Lucide se resuelve en build: el SVG viaja inline en el HTML y no se
+ * envía JavaScript ni se pide una fuente de iconos.
+ *
+ * Los iconos son SECUNDARIOS: acompañan al texto, nunca lo sustituyen.
+ * Por eso son decorativos (`aria-hidden`) salvo que reciban `label`.
+ */
+import Accessibility from '@lucide/astro/icons/accessibility';
+import ArrowLeft from '@lucide/astro/icons/arrow-left';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import ArrowUpRight from '@lucide/astro/icons/arrow-up-right';
+import Book from '@lucide/astro/icons/book';
+import BookOpen from '@lucide/astro/icons/book-open';
+import Bot from '@lucide/astro/icons/bot';
+import Building from '@lucide/astro/icons/building-2';
+import Calculator from '@lucide/astro/icons/calculator';
+import Calendar from '@lucide/astro/icons/calendar';
+import ChartColumn from '@lucide/astro/icons/chart-column';
+import Check from '@lucide/astro/icons/check';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import ChevronRight from '@lucide/astro/icons/chevron-right';
+import CirclePlay from '@lucide/astro/icons/circle-play';
+import ClipboardCheck from '@lucide/astro/icons/clipboard-check';
+import Clock from '@lucide/astro/icons/clock';
+import Compass from '@lucide/astro/icons/compass';
+import Download from '@lucide/astro/icons/download';
+import FileText from '@lucide/astro/icons/file-text';
+import Gamepad from '@lucide/astro/icons/gamepad-2';
+import Globe from '@lucide/astro/icons/globe';
+import GraduationCap from '@lucide/astro/icons/graduation-cap';
+import Layers from '@lucide/astro/icons/layers';
+import Library from '@lucide/astro/icons/library';
+import Lightbulb from '@lucide/astro/icons/lightbulb';
+import Link from '@lucide/astro/icons/link';
+import ListChecks from '@lucide/astro/icons/list-checks';
+import Megaphone from '@lucide/astro/icons/megaphone';
+import Menu from '@lucide/astro/icons/menu';
+import MessageCircle from '@lucide/astro/icons/message-circle';
+import Newspaper from '@lucide/astro/icons/newspaper';
+import Palette from '@lucide/astro/icons/palette';
+import Phone from '@lucide/astro/icons/phone';
+import Play from '@lucide/astro/icons/play';
+import Puzzle from '@lucide/astro/icons/puzzle';
+import Route from '@lucide/astro/icons/route';
+import Scale from '@lucide/astro/icons/scale';
+import Search from '@lucide/astro/icons/search';
+import Settings from '@lucide/astro/icons/settings';
+import ShieldCheck from '@lucide/astro/icons/shield-check';
+import SlidersHorizontal from '@lucide/astro/icons/sliders-horizontal';
+import SquarePen from '@lucide/astro/icons/square-pen';
+import Tag from '@lucide/astro/icons/tag';
+import UserCheck from '@lucide/astro/icons/user-check';
+import Users from '@lucide/astro/icons/users';
+import Video from '@lucide/astro/icons/video';
+import WandSparkles from '@lucide/astro/icons/wand-sparkles';
+import X from '@lucide/astro/icons/x';
+
+interface Props {
+  name: string;
+  class?: string;
+  /** Si el icono aporta información que el texto no da, nómbralo. */
+  label?: string;
+  [key: string]: unknown;
+}
+
+const { name, class: className = 'size-5', label, ...rest } = Astro.props;
+
+const REGISTRY: Record<string, unknown> = {
+  // Categorías de contenido
+  sparkles: WandSparkles,
+  palette: Palette,
+  puzzle: Puzzle,
+  'clipboard-check': ClipboardCheck,
+  'chart-bar': ChartColumn,
+  users: Users,
+  chat: MessageCircle,
+  video: Video,
+  accessibility: Accessibility,
+  book: Book,
+  compass: Compass,
+  settings: Settings,
+  calculator: Calculator,
+  'user-check': UserCheck,
+  lightbulb: Lightbulb,
+
+  // Intents
+  bot: Bot,
+  gamepad: Gamepad,
+  'square-pen': SquarePen,
+  'message-circle': MessageCircle,
+  'graduation-cap': GraduationCap,
+
+  // Accesos institucionales
+  megaphone: Megaphone,
+  scale: Scale,
+  library: Library,
+  newspaper: Newspaper,
+  'file-text': FileText,
+  'shield-check': ShieldCheck,
+  phone: Phone,
+  download: Download,
+  link: Link,
+  globe: Globe,
+  building: Building,
+  calendar: Calendar,
+
+  // Interfaz
+  search: Search,
+  arrow: ArrowRight,
+  'arrow-left': ArrowLeft,
+  external: ArrowUpRight,
+  clock: Clock,
+  play: Play,
+  'circle-play': CirclePlay,
+  check: Check,
+  close: X,
+  menu: Menu,
+  'chevron-down': ChevronDown,
+  'chevron-right': ChevronRight,
+  filter: SlidersHorizontal,
+  layers: Layers,
+  tag: Tag,
+  'book-open': BookOpen,
+  route: Route,
+  'list-checks': ListChecks,
+};
+
+const Glyph = (REGISTRY[name] ?? Tag) as typeof Tag;
+
+const a11y = label
+  ? ({ role: 'img', 'aria-label': label } as const)
+  : ({ 'aria-hidden': 'true' } as const);
+---
+
+<Glyph class={className} stroke-width={1.75} {...a11y} {...rest} />

@@ -1,0 +1,291 @@
+---
+import Icon from '../primitives/Icon.astro';
+import { getIntents } from '../../lib/content';
+
+/**
+ * Búsqueda global.
+ *
+ * Se monta una vez por página, dentro del footer del layout.
+ * El índice se descarga bajo demanda la primera vez que se abre,
+ * de modo que ninguna página paga ese coste al cargar.
+ */
+const intents = await getIntents();
+---
+
+<dialog
+  id="search-dialog"
+  aria-label="Búsqueda global"
+  class="m-0 w-full max-w-2xl overflow-hidden rounded-panel bg-white p-0 shadow-dialog backdrop:bg-end-950/55 backdrop:backdrop-blur-sm sm:mx-auto sm:mt-[10vh]"
+>
+  <!-- Los tres colores identifican de dónde vendrá cada resultado. -->
+  <div aria-hidden="true" class="flex h-1">
+    <span class="flex-1 bg-end-600"></span>
+    <span class="flex-1 bg-teal-500"></span>
+    <span class="flex-1 bg-clay-500"></span>
+  </div>
+
+  <div class="flex items-center gap-3 border-b border-border px-5 py-4">
+    <Icon name="search" class="size-5 shrink-0 text-ink-muted" />
+
+    <label for="search-input" class="sr-only">
+      Buscar recursos, tutoriales y contenidos
+    </label>
+    <input
+      id="search-input"
+      type="search"
+      autocomplete="off"
+      placeholder="¿Qué necesitas hacer?"
+      class="w-full bg-transparent text-base text-ink outline-none placeholder:text-ink-muted"
+      aria-describedby="search-hint"
+      aria-controls="search-results"
+    />
+
+    <button
+      type="button"
+      data-search-close
+      class="grid size-9 shrink-0 place-items-center rounded-control text-ink-muted transition-colors hover:bg-paper-deep hover:text-ink"
+    >
+      <span class="sr-only">Cerrar búsqueda</span>
+      <Icon name="close" class="size-4" />
+    </button>
+  </div>
+
+  <p id="search-hint" class="sr-only">
+    Escribe para buscar. Los resultados aparecen agrupados por sección.
+  </p>
+
+  <!-- Región viva: anuncia el número de resultados a lectores de pantalla. -->
+  <p class="sr-only" role="status" aria-live="polite" data-search-status></p>
+
+  <div id="search-results" class="max-h-[60vh] overflow-y-auto overscroll-contain p-3">
+    <!-- Estado inicial: atajos por necesidad en lugar de un panel vacío. -->
+    <div data-search-empty class="px-2 py-3">
+      <p class="eyebrow text-ink-muted">Empieza por lo que necesitas</p>
+      <ul class="mt-4 grid gap-0.5 sm:grid-cols-2">
+        {
+          intents.map((intent) => (
+            <li>
+              <a
+                href={`/necesito/${intent.id}/`}
+                class="flex items-center gap-3 rounded-control px-3 py-2.5 text-[0.9375rem] font-medium text-ink-soft transition-colors hover:bg-paper hover:text-end-900"
+              >
+                <Icon name={intent.data.icon} class="size-4 shrink-0 opacity-60" />
+                {intent.data.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div data-search-list class="hidden"></div>
+
+    <div data-search-none class="hidden px-3 py-12 text-center">
+      <p class="font-display font-bold text-end-900">Sin resultados</p>
+      <p class="mt-2 text-sm text-ink-soft">
+        Prueba con otras palabras, o explora
+        <a href="/recursos/" class="font-semibold text-end-700 underline underline-offset-4">
+          los recursos
+        </a>.
+      </p>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  interface SearchDocument {
+    id: string;
+    group: 'resource' | 'tutorial' | 'teacher';
+    title: string;
+    description: string;
+    href: string;
+    meta: string;
+    keywords: string;
+  }
+
+  const GROUP_LABELS: Record<string, string> = {
+    resource: 'Recursos',
+    tutorial: 'END Digital',
+    teacher: 'Para docentes',
+  };
+
+  /** Cada sección conserva su color también dentro del buscador. */
+  const GROUP_RULES: Record<string, string> = {
+    resource: 'bg-end-600',
+    tutorial: 'bg-teal-500',
+    teacher: 'bg-clay-500',
+  };
+
+  const dialogEl = document.getElementById('search-dialog') as HTMLDialogElement | null;
+  const inputEl = document.getElementById('search-input') as HTMLInputElement | null;
+  const listEl = document.querySelector('[data-search-list]') as HTMLElement | null;
+  const emptyEl = document.querySelector('[data-search-empty]') as HTMLElement | null;
+  const noneEl = document.querySelector('[data-search-none]') as HTMLElement | null;
+  const status = document.querySelector('[data-search-status]') as HTMLElement | null;
+
+  if (dialogEl && inputEl && listEl && emptyEl && noneEl) {
+    // Aliases no nulos: evita comprobar en cada uso dentro de los closures.
+    const dialog = dialogEl;
+    const input = inputEl;
+    const list = listEl;
+    const empty = emptyEl;
+    const none = noneEl;
+
+    let fuse: Fuse<SearchDocument> | null = null;
+    let loading = false;
+
+    /** Descarga el índice una sola vez, al primer uso del buscador. */
+    async function ensureIndex() {
+      if (fuse || loading) return;
+      loading = true;
+
+      try {
+        const response = await fetch('/api/search-index.json');
+        const documents: SearchDocument[] = await response.json();
+
+        fuse = new Fuse(documents, {
+          keys: [
+            { name: 'title', weight: 3 },
+            { name: 'description', weight: 1.5 },
+            { name: 'keywords', weight: 1 },
+          ],
+          threshold: 0.38,
+          ignoreLocation: true,
+          minMatchCharLength: 2,
+        });
+      } catch {
+        // Sin índice el buscador queda inerte, pero la página sigue usable.
+      } finally {
+        loading = false;
+      }
+    }
+
+    function escapeHtml(value: string) {
+      const el = document.createElement('span');
+      el.textContent = value;
+      return el.innerHTML;
+    }
+
+    function render(query: string) {
+      const trimmed = query.trim();
+
+      if (trimmed.length < 2) {
+        empty.classList.remove('hidden');
+        list.classList.add('hidden');
+        none.classList.add('hidden');
+        if (status) status.textContent = '';
+        return;
+      }
+
+      const results = fuse ? fuse.search(trimmed, { limit: 24 }) : [];
+      empty.classList.add('hidden');
+
+      if (results.length === 0) {
+        list.classList.add('hidden');
+        none.classList.remove('hidden');
+        if (status) status.textContent = 'Sin resultados';
+        return;
+      }
+
+      none.classList.add('hidden');
+      list.classList.remove('hidden');
+
+      // Se agrupa por sección para que el docente ubique el tipo de respuesta.
+      const groups = new Map<string, SearchDocument[]>();
+      for (const { item } of results) {
+        const bucket = groups.get(item.group) ?? [];
+        bucket.push(item);
+        groups.set(item.group, bucket);
+      }
+
+      const order = ['resource', 'tutorial', 'teacher'];
+      let html = '';
+
+      for (const group of order) {
+        const items = groups.get(group);
+        if (!items?.length) continue;
+
+        html += `<section class="mb-4">
+          <h2 class="flex items-center gap-2.5 px-3 py-2 eyebrow text-ink-muted">
+            <span aria-hidden="true" class="h-[3px] w-6 rounded-full ${GROUP_RULES[group]}"></span>
+            ${GROUP_LABELS[group]}
+          </h2>
+          <ul>`;
+
+        for (const item of items.slice(0, 6)) {
+          html += `<li>
+            <a href="${item.href}" class="flex items-start gap-3 rounded-control px-3 py-3 transition-colors hover:bg-paper focus-visible:bg-paper">
+              <span class="min-w-0 flex-1">
+                <span class="block truncate font-semibold text-end-900">${escapeHtml(item.title)}</span>
+                <span class="mt-1 block line-clamp-2 text-sm leading-relaxed text-ink-soft">${escapeHtml(item.description)}</span>
+              </span>
+              ${
+                item.meta
+                  ? `<span class="shrink-0 rounded-[3px] bg-paper-deep px-2 py-0.5 text-[11px] font-semibold text-ink-soft">${escapeHtml(item.meta)}</span>`
+                  : ''
+              }
+            </a>
+          </li>`;
+        }
+
+        html += '</ul></section>';
+      }
+
+      list.innerHTML = html;
+
+      if (status) {
+        status.textContent = `${results.length} ${results.length === 1 ? 'resultado' : 'resultados'}`;
+      }
+    }
+
+    async function open(initial = '') {
+      await ensureIndex();
+      if (!dialog.open) dialog.showModal();
+
+      input.value = initial;
+      render(initial);
+      input.focus();
+    }
+
+    document.querySelectorAll('[data-search-open]').forEach((trigger) => {
+      trigger.addEventListener('click', () => open());
+    });
+
+    document.querySelectorAll('[data-search-close]').forEach((trigger) => {
+      trigger.addEventListener('click', () => dialog.close());
+    });
+
+    // Los campos de la home delegan en el diálogo en lugar de duplicar lógica.
+    document.querySelectorAll('[data-search-proxy]').forEach((proxy) => {
+      proxy.addEventListener('focus', () => open((proxy as HTMLInputElement).value));
+      proxy.addEventListener('click', () => open((proxy as HTMLInputElement).value));
+    });
+
+    let debounce: number | undefined;
+    input.addEventListener('input', () => {
+      window.clearTimeout(debounce);
+      debounce = window.setTimeout(() => render(input.value), 120);
+    });
+
+    // Atajo "/" para abrir, salvo cuando ya se está escribiendo en un campo.
+    document.addEventListener('keydown', (event) => {
+      const target = event.target as HTMLElement | null;
+      const typing =
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.isContentEditable;
+
+      if (event.key === '/' && !typing && !dialog.open) {
+        event.preventDefault();
+        open();
+      }
+    });
+
+    // Cierra al hacer clic fuera del panel.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  }
+</script>

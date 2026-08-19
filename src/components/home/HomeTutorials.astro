@@ -1,0 +1,179 @@
+---
+import Icon from '../primitives/Icon.astro';
+import {
+  formatDuration,
+  LEVEL_LABELS,
+  type Tutorial,
+} from '../../lib/content';
+
+/**
+ * END Digital en la home.
+ *
+ * El área tiene territorio propio: banda profunda en cian, con su
+ * propio lienzo de orbes y malla. No es "otra categoría más", es el
+ * aula virtual de la institución.
+ *
+ * El tutorial destacado se presenta como pieza, con sus pasos reales
+ * a la vista. No se dibuja un reproductor donde no hay video: el
+ * indicador de reproducción solo aparece si el tutorial declara uno.
+ */
+interface Props {
+  featured?: Tutorial;
+  tutorials: Tutorial[];
+  total: number;
+}
+
+const { featured, tutorials, total } = Astro.props;
+
+/** El resto: los que no son el destacado. */
+const rest = tutorials.filter((t) => t.id !== featured?.id).slice(0, 4);
+---
+
+<section
+  aria-labelledby="home-tutoriales"
+  class="on-dark relative isolate overflow-hidden bg-teal-950 py-20 text-white lg:py-28"
+>
+  <div aria-hidden="true" class="absolute inset-0 -z-10">
+    <div class="dot-grid-dark absolute inset-0 opacity-60"></div>
+    <span
+      class="orb animate-drift-slow -top-40 left-[12%] size-[34rem] bg-teal-500/45"
+    ></span>
+    <span
+      class="orb animate-drift right-[-10rem] bottom-[-10rem] size-[30rem] bg-end-600/50"
+    ></span>
+  </div>
+
+  <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div class="max-w-xl">
+        <p class="eyebrow text-teal-300">Aula virtual</p>
+        <h2
+          id="home-tutoriales"
+          class="mt-4 font-display text-title font-extrabold text-white"
+        >
+          Aprende a sacarle más provecho a tu aula virtual.
+        </h2>
+      </div>
+
+      <a
+        href="/end-digital/"
+        class="group flex items-center gap-2.5 rounded-full bg-white/10 py-2.5 pr-4 pl-5 text-[0.9375rem] font-semibold text-white ring-1 ring-white/20 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/16"
+      >
+        Ver los {total} tutoriales
+        <span
+          class="grid size-7 place-items-center rounded-full bg-teal-400 text-teal-950 transition-transform duration-300 group-hover:translate-x-0.5"
+        >
+          <Icon name="arrow" class="size-3.5" />
+        </span>
+      </a>
+    </div>
+
+    <div class="reveal mt-12 grid gap-5 lg:grid-cols-[1fr_1fr] lg:gap-6">
+      {/* ── TUTORIAL DESTACADO ──────────────────────────────── */}
+      {
+        featured && (
+          <article class="group lift glass-dark relative flex flex-col overflow-hidden rounded-panel p-8 lg:p-10">
+            <span
+              aria-hidden="true"
+              class="orb animate-drift-slow -top-20 -right-16 size-64 bg-teal-400/40"
+            />
+
+            <div class="relative flex items-center gap-3">
+              <span class="eyebrow rounded-full bg-teal-400 px-3.5 py-1.5 text-teal-950">
+                Empieza por aquí
+              </span>
+              {featured.data.video && (
+                <Icon name="circle-play" class="size-5 text-teal-300" />
+              )}
+            </div>
+
+            <h3 class="relative mt-7 font-display text-3xl leading-tight font-extrabold text-white lg:text-4xl">
+              <a
+                href={`/end-digital/${featured.id}/`}
+                class="after:absolute after:inset-0"
+              >
+                <span class="link-underline">{featured.data.title}</span>
+              </a>
+            </h3>
+
+            <p class="relative mt-4 max-w-md leading-relaxed text-white/70">
+              {featured.data.description}
+            </p>
+
+            <p class="relative mt-6 flex flex-wrap items-center gap-2.5 text-sm">
+              <span class="tabular flex items-center gap-1.5 rounded-full bg-white/8 px-3 py-1.5 text-white/85 ring-1 ring-white/12">
+                <Icon name="clock" class="size-3.5" />
+                {formatDuration(featured.data.duration)}
+              </span>
+              <span class="rounded-full bg-white/8 px-3 py-1.5 text-white/85 ring-1 ring-white/12">
+                {LEVEL_LABELS[featured.data.level]}
+              </span>
+            </p>
+
+            {/* Los pasos reales del tutorial: el docente ve el
+                recorrido antes de entrar. */}
+            {featured.data.steps.length > 0 && (
+              <ol class="relative mt-8 space-y-2.5 border-t border-white/12 pt-7">
+                {featured.data.steps.slice(0, 4).map((step, index) => (
+                  <li class="flex items-start gap-3 text-[0.9375rem] text-white/75">
+                    <span class="tabular mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-teal-400/20 text-[0.6875rem] font-bold text-teal-300">
+                      {index + 1}
+                    </span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            <p class="relative mt-auto flex items-center gap-2 pt-8 font-semibold text-teal-300">
+              Ver tutorial
+              <Icon
+                name="arrow"
+                class="size-4 transition-transform duration-300 group-hover:translate-x-1.5"
+              />
+            </p>
+          </article>
+        )
+      }
+
+      {/* ── LOS DEMÁS ───────────────────────────────────────── */}
+      <ul class="grid content-start gap-3.5">
+        {
+          rest.map((tutorial, index) => (
+            <li class="reveal-step" style={`--step:${index}`}>
+              <a
+                href={`/end-digital/${tutorial.id}/`}
+                class="group lift flex items-center gap-5 rounded-panel bg-white/6 p-6 ring-1 ring-white/12 backdrop-blur-md transition-colors hover:bg-white/10"
+              >
+                <span
+                  aria-hidden="true"
+                  class="tabular grid size-11 shrink-0 place-items-center rounded-[0.9rem] bg-teal-400/15 font-display font-bold text-teal-300 transition-colors duration-300 group-hover:bg-teal-400 group-hover:text-teal-950"
+                >
+                  {String(index + 2).padStart(2, '0')}
+                </span>
+
+                <span class="min-w-0 flex-1">
+                  <span class="block font-display text-lg leading-snug font-bold text-white">
+                    <span class="link-underline">{tutorial.data.title}</span>
+                  </span>
+                  <span class="tabular mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-white/55">
+                    <span>{formatDuration(tutorial.data.duration)}</span>
+                    <span aria-hidden="true" class="opacity-50">
+                      ·
+                    </span>
+                    <span>{LEVEL_LABELS[tutorial.data.level]}</span>
+                  </span>
+                </span>
+
+                <Icon
+                  name={tutorial.data.video ? 'circle-play' : 'arrow'}
+                  class="size-4 shrink-0 text-white/45 transition-all duration-300 group-hover:translate-x-1 group-hover:text-teal-300"
+                />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

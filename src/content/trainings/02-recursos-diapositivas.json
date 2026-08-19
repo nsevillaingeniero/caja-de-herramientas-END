@@ -1,0 +1,32 @@
+{
+  "topic": "Diapositivas que apoyan al docente y no compiten con su labor",
+  "track": "recursos-digitales",
+  "categoryLabel": "Recursos educativos digitales",
+  "tools": [
+    "Genially",
+    "Canva",
+    "PowerPoint",
+    "Bancos de imágenes"
+  ],
+  "date": "2026-08-21",
+  "dateLabel": "Viernes 21 de agosto",
+  "groups": [
+    {
+      "start": "10:00",
+      "end": "12:00"
+    },
+    {
+      "start": "16:00",
+      "end": "18:00"
+    }
+  ],
+  "facilitators": [
+    "Alexis González",
+    "Nicolás Sevilla"
+  ],
+  "audience": "abierta",
+  "support": {
+    "note": "Se comparte la sesión grabada y tutoriales que la complementan."
+  },
+  "order": 2
+}

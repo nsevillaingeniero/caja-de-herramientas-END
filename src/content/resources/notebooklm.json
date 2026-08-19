@@ -1,0 +1,24 @@
+{
+  "name": "NotebookLM",
+  "shortDescription": "Sube tus documentos y la IA responde citando exactamente de dónde sacó cada afirmación.",
+  "description": "NotebookLM es un asistente de Google que trabaja únicamente sobre los documentos que tú le entregas: PDF, presentaciones, documentos o enlaces. A partir de ese material responde preguntas, elabora resúmenes y genera guías de estudio.\n\nLa diferencia frente a un chatbot general es que cada respuesta viene con la cita al fragmento del documento original, lo que reduce el riesgo de información inventada y permite verificar. Es útil para preparar material a partir de bibliografía densa, o para que los estudiantes exploren un corpus de lecturas.",
+  "activities": [
+    "Resúmenes de bibliografía extensa",
+    "Guías de estudio a partir de lecturas",
+    "Preguntas frecuentes sobre un corpus de documentos",
+    "Mapas de temas de un material",
+    "Preparación de material de clase desde fuentes propias"
+  ],
+  "modality": "web",
+  "pricing": "gratis",
+  "pricingNote": "Requiere una cuenta de Google.",
+  "categories": ["inteligencia-artificial", "recursos-educativos"],
+  "moodleIntegration": "enlace",
+  "moodleUsage": "Es una herramienta de preparación docente más que de aula. Úsala para producir el material y luego sube el resultado a END Digital como recurso o página.",
+  "languages": ["Español", "Inglés"],
+  "url": "https://notebooklm.google.com",
+  "intents": ["usar-ia", "crear-contenidos"],
+  "tags": ["ia", "generativa", "resumen", "documentos", "estudio"],
+  "featured": true,
+  "order": 3
+}

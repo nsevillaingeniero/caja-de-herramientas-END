@@ -1,0 +1,26 @@
+{
+  "name": "H5P",
+  "shortDescription": "Crea contenido interactivo (videos con preguntas, presentaciones, juegos) directamente dentro de END Digital.",
+  "description": "H5P es un formato abierto para crear contenido interactivo en HTML5. Permite construir más de cuarenta tipos de actividad —video interactivo, presentaciones con preguntas, líneas de tiempo, tarjetas de memoria, arrastrar y soltar— sin escribir una sola línea de código.\n\nSu mayor ventaja para la Escuela Nacional del Deporte es que Moodle lo incluye de forma nativa: el contenido se crea y se guarda dentro de END Digital, y las calificaciones pasan automáticamente al libro de calificaciones del curso. No dependes de una plataforma externa ni de que tus estudiantes creen otra cuenta.",
+  "activities": [
+    "Video interactivo con preguntas incrustadas",
+    "Presentaciones con actividades embebidas",
+    "Ejercicios de arrastrar y soltar",
+    "Tarjetas de memoria y flashcards",
+    "Líneas de tiempo interactivas",
+    "Preguntas de opción múltiple y rellenar espacios"
+  ],
+  "modality": "web",
+  "pricing": "gratis",
+  "pricingNote": "Software libre. Incluido en Moodle sin costo adicional.",
+  "categories": ["actividades-interactivas", "creacion-de-contenidos", "evaluacion"],
+  "moodleIntegration": "nativa",
+  "moodleUsage": "En tu curso, activa la edición y usa «Añadir una actividad o un recurso» → «Contenido interactivo (H5P)». También puedes subir archivos .h5p al Banco de contenido del curso y reutilizarlos en varias asignaturas.",
+  "languages": ["Español", "Inglés"],
+  "url": "https://h5p.org",
+  "externalGuide": "https://h5p.org/documentation/for-authors",
+  "intents": ["crear-actividad", "evaluar", "crear-contenidos"],
+  "tags": ["interactivo", "gamificación", "video", "moodle", "actividad"],
+  "featured": true,
+  "order": 1
+}

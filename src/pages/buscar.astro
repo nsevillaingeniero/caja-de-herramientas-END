@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/shared/PageHeader.astro';
+import Icon from '../components/primitives/Icon.astro';
+
+import { getIntents } from '../lib/content';
+import { accent as accentStyles } from '../lib/accents';
+
+/**
+ * Página de búsqueda con URL propia.
+ *
+ * Existe para poder compartir y enlazar una búsqueda, y como destino
+ * accesible sin JavaScript. La experiencia principal sigue siendo el
+ * diálogo global, que esta página abre automáticamente.
+ */
+const intents = await getIntents();
+---
+
+<BaseLayout
+  title="Buscar"
+  description="Busca recursos, tutoriales de END Digital y contenidos institucionales."
+  noindex
+>
+  <PageHeader
+    eyebrow="Búsqueda global"
+    title="Buscar"
+    description="Recursos, tutoriales y contenidos institucionales en un solo lugar."
+    accent="end"
+    tone="deep"
+    breadcrumbs={[{ href: '/', label: 'Inicio' }]}
+  >
+    <div class="mt-9 max-w-xl">
+      <label for="page-search" class="sr-only">¿Qué necesitas hacer?</label>
+      <div class="group relative">
+        <Icon
+          name="search"
+          class="pointer-events-none absolute top-1/2 left-5 size-5 -translate-y-1/2 text-ink-muted transition-colors group-focus-within:text-end-700"
+        />
+        <input
+          id="page-search"
+          type="search"
+          data-search-proxy
+          autocomplete="off"
+          placeholder="¿Qué necesitas hacer?"
+          class="w-full rounded-control bg-white py-4.5 pr-5 pl-13 text-base text-ink outline-none placeholder:text-ink-muted focus:ring-4 focus:ring-teal-400/45"
+        />
+      </div>
+    </div>
+  </PageHeader>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-14 sm:px-8 lg:py-16">
+    <h2 class="font-display text-section font-extrabold text-end-900">
+      O empieza por lo que necesitas
+    </h2>
+
+    <ul class="mt-9 border-t border-border-strong">
+      {
+        intents.map((intent, index) => {
+          const tokens = accentStyles(intent.data.accent);
+
+          return (
+            <li class="border-b border-border-strong">
+              <a
+                href={`/necesito/${intent.id}/`}
+                class="group relative flex items-center gap-5 py-6 sm:gap-8"
+              >
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    'absolute top-0 left-0 h-full w-0 transition-all duration-400 ease-out-soft group-hover:w-1.5',
+                    tokens.rule,
+                  ]}
+                />
+
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    'tabular w-8 shrink-0 font-display text-sm font-bold text-ink-muted transition-all duration-300 group-hover:pl-5 sm:w-12',
+                    tokens.hoverText,
+                  ]}
+                >
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+
+                <span class="min-w-0 flex-1">
+                  <span class="block font-display text-row font-bold text-end-900">
+                    {intent.data.label}
+                  </span>
+                  <span class="mt-1.5 block text-[0.9375rem] leading-relaxed text-ink-soft">
+                    {intent.data.description}
+                  </span>
+                </span>
+
+                <Icon
+                  name="arrow"
+                  class:list={[
+                    'size-5 shrink-0 text-ink-muted transition-all duration-300 group-hover:translate-x-1.5',
+                    tokens.hoverText,
+                  ]}
+                />
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<script>
+  // Lleva el foco al buscador al llegar a esta página.
+  window.addEventListener('load', () => {
+    const input = document.getElementById('page-search') as HTMLInputElement | null;
+    input?.focus();
+  });
+</script>

@@ -1,0 +1,99 @@
+---
+import Icon from '../primitives/Icon.astro';
+import ResourceMark from './ResourceMark.astro';
+import {
+  MODALITY_LABELS,
+  MOODLE_LABELS,
+  PRICING_LABELS,
+  type Category,
+  type Resource,
+} from '../../lib/content';
+import { accent as accentStyles, type Accent } from '../../lib/accents';
+
+/**
+ * Tarjeta de recurso.
+ *
+ * El filete superior lleva el color de la categoría: en una rejilla
+ * de nueve, eso es lo que impide que todas se lean como la misma
+ * tarjeta repetida. El resto es jerarquía tipográfica, no marcos.
+ */
+interface Props {
+  resource: Resource;
+  categories: Category[];
+  class?: string;
+}
+
+const { resource, categories, class: className = '' } = Astro.props;
+const { data } = resource;
+
+const primary = categories.find((c) => c.id === data.categories[0]?.id);
+const tokens = accentStyles(primary?.data.accent as Accent);
+
+const inMoodle = data.moodleIntegration !== 'ninguna';
+---
+
+<article
+  class:list={[
+    'group relative flex flex-col overflow-hidden rounded-card bg-white',
+    'ring-1 ring-border transition-all duration-300 ease-out-soft',
+    'hover:-translate-y-1 hover:shadow-lift hover:ring-border-strong',
+    className,
+  ]}
+>
+  <span aria-hidden="true" class={`block h-[3px] w-full ${tokens.rule}`}></span>
+
+  <div class="flex flex-1 flex-col p-6">
+    <div class="flex items-start justify-between gap-4">
+      <ResourceMark
+        name={data.name}
+        logo={data.logo}
+        accent={primary?.data.accent as Accent}
+      />
+
+      <span class="tabular text-sm font-semibold text-ink-muted">
+        {PRICING_LABELS[data.pricing]}
+      </span>
+    </div>
+
+    <h3 class="mt-5 font-display text-xl font-extrabold text-end-900">
+      <a href={`/recursos/${resource.id}/`} class="after:absolute after:inset-0">
+        <span class="link-underline">{data.name}</span>
+      </a>
+    </h3>
+
+    {
+      primary && (
+        <p class={`eyebrow mt-2 ${tokens.text}`}>{primary.data.name}</p>
+      )
+    }
+
+    <p class="mt-4 line-clamp-3 flex-1 leading-relaxed text-ink-soft">
+      {data.shortDescription}
+    </p>
+
+    <div
+      class="mt-6 flex items-center justify-between gap-4 border-t border-border pt-5 text-sm"
+    >
+      <p class="flex min-w-0 items-center gap-2 text-ink-muted">
+        {
+          inMoodle ? (
+            <>
+              <Icon name="check" class={`size-4 shrink-0 ${tokens.text}`} />
+              <span class="truncate">{MOODLE_LABELS[data.moodleIntegration]}</span>
+            </>
+          ) : (
+            <span class="truncate">{MODALITY_LABELS[data.modality]}</span>
+          )
+        }
+      </p>
+
+      <Icon
+        name="arrow"
+        class:list={[
+          'size-4 shrink-0 text-ink-muted transition-all duration-300 group-hover:translate-x-1',
+          tokens.hoverText,
+        ]}
+      />
+    </div>
+  </div>
+</article>

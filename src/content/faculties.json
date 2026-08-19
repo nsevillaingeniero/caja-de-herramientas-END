@@ -1,0 +1,20 @@
+[
+  {
+    "id": "salud-y-rehabilitacion",
+    "name": "Facultad de Salud y Rehabilitación",
+    "shortName": "Salud y Rehabilitación",
+    "order": 1
+  },
+  {
+    "id": "ciencias-educacion-y-deporte",
+    "name": "Facultad de Ciencias de la Educación y del Deporte",
+    "shortName": "Educación y Deporte",
+    "order": 2
+  },
+  {
+    "id": "ciencias-economicas-y-administracion",
+    "name": "Facultad de Ciencias Económicas y de la Administración",
+    "shortName": "Económicas y Administración",
+    "order": 3
+  }
+]

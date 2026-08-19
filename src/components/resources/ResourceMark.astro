@@ -1,0 +1,91 @@
+---
+import type { Accent } from '../../lib/accents';
+
+/**
+ * Identidad visual de una herramienta.
+ *
+ * Si el recurso declara un logotipo oficial en `public/images/resources/`
+ * se muestra tal cual, sobre una superficie blanca elevada.
+ *
+ * Si no lo declara —que es lo normal mientras la institución reúne los
+ * permisos de uso— se compone una marca tipográfica: la inicial en
+ * display sobre un degradado del color de su categoría, con brillo
+ * superior y un punto de acento. No es un hueco a la espera del
+ * logotipo, es una marca terminada.
+ *
+ * Nunca se inventa un logotipo ni se sustituye por un emoji.
+ */
+interface Props {
+  name: string;
+  logo?: string;
+  accent?: Accent;
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const {
+  name,
+  logo,
+  accent = 'end',
+  size = 'md',
+  class: className = '',
+} = Astro.props;
+
+const BOX = {
+  sm: 'size-11 rounded-[0.75rem]',
+  md: 'size-14 rounded-[1rem]',
+  lg: 'size-20 rounded-[1.35rem]',
+} as const;
+
+const LETTER = {
+  sm: 'text-lg',
+  md: 'text-2xl',
+  lg: 'text-4xl',
+} as const;
+
+const DOT = {
+  sm: 'size-1.5 bottom-1.5 right-1.5',
+  md: 'size-2 bottom-2 right-2',
+  lg: 'size-2.5 bottom-2.5 right-2.5',
+} as const;
+
+/** Degradado de la marca tipográfica, por acento de área. */
+const GRADIENT: Record<Accent, string> = {
+  end: 'from-end-500 to-end-800',
+  teal: 'from-teal-500 to-teal-800',
+  clay: 'from-clay-400 to-clay-600',
+  slate: 'from-end-700 to-end-950',
+};
+
+const initial = name.trim().charAt(0).toUpperCase();
+---
+
+{
+  logo ? (
+    <span
+      class={`grid shrink-0 place-items-center bg-white p-2.5 shadow-float ring-1 ring-border ${BOX[size]} ${className}`}
+    >
+      <img
+        src={logo}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        class="size-full object-contain"
+      />
+    </span>
+  ) : (
+    <span
+      aria-hidden="true"
+      class={`relative grid shrink-0 place-items-center overflow-hidden bg-linear-to-br font-display font-extrabold text-white shadow-float ${GRADIENT[accent]} ${BOX[size]} ${LETTER[size]} ${className}`}
+    >
+      {/* Brillo superior: la luz cae desde arriba, como en el resto
+          del sistema de superficies. */}
+      <span class="absolute inset-x-0 top-0 h-1/2 bg-linear-to-b from-white/25 to-transparent" />
+      <span class="relative">{initial}</span>
+      <span
+        class={`absolute rounded-full bg-white/70 ${DOT[size]}`}
+        style={`box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 25%, transparent)`}
+      />
+    </span>
+  )
+}

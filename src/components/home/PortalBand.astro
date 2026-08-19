@@ -1,0 +1,247 @@
+---
+import { Image } from 'astro:assets';
+
+import Icon from '../primitives/Icon.astro';
+import {
+  CONTENT_TYPE_LABELS,
+  formatDate,
+  type TeacherContent,
+} from '../../lib/content';
+import { SITE } from '../../config/site.mjs';
+import campusImage from '../../assets/institutional/espacios-end.jpg';
+
+/**
+ * El portal institucional en la home.
+ *
+ * Funciona como una ventana: una superficie elevada con la barra de
+ * origen arriba —el dominio real de la Escuela— y dentro, lo que el
+ * portal publica. No imita un navegador ni incrusta un iframe; deja
+ * claro de dónde viene cada pieza y quién manda sobre ella.
+ *
+ * El naranja es el color del área y aquí es el único cálido de la
+ * página: marca los enlaces y los tipos de contenido, nada más.
+ */
+interface Props {
+  publications: TeacherContent[];
+  accessCount: number;
+}
+
+const { publications, accessCount } = Astro.props;
+
+const [lead, ...rest] = publications;
+const portalHost = SITE.portal.url.replace(/^https?:\/\//, '');
+
+/**
+ * El portal a veces devuelve un resumen que solo repite el titular.
+ * Repetirlo en pantalla no informa: se descarta y la ficha queda
+ * limpia en lugar de decir dos veces lo mismo.
+ */
+function usefulExcerpt(title: string, excerpt: string): string | null {
+  const normalize = (value: string) =>
+    value
+      .toLowerCase()
+      .replace(/[.…]+$/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  const clean = normalize(excerpt);
+  return clean && !clean.startsWith(normalize(title)) ? excerpt : null;
+}
+
+const leadExcerpt = lead
+  ? usefulExcerpt(lead.data.title, lead.data.excerpt)
+  : null;
+---
+
+<section
+  aria-labelledby="portal-title"
+  class="relative isolate overflow-hidden bg-paper py-20 lg:py-28"
+>
+  <div aria-hidden="true" class="absolute inset-0 -z-10">
+    <span
+      class="orb animate-drift-slow -top-24 left-[-8rem] size-[26rem] bg-clay-200/60"
+    ></span>
+    <span
+      class="orb animate-drift right-[-8rem] bottom-[-6rem] size-[24rem] bg-end-200/60"
+    ></span>
+  </div>
+
+  <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div class="max-w-xl">
+        <p class="eyebrow text-clay-600">Portal institucional</p>
+        <h2
+          id="portal-title"
+          class="mt-4 font-display text-title font-extrabold text-end-950"
+        >
+          De interés para docentes
+        </h2>
+        <p class="mt-5 text-lg leading-relaxed text-ink-soft">
+          {accessCount} accesos directos y lo último que publica la {
+            SITE.institutionShort
+          }.
+        </p>
+      </div>
+
+      <a
+        href="/para-docentes/"
+        class="group flex items-center gap-2.5 rounded-full bg-white py-2.5 pr-4 pl-5 text-[0.9375rem] font-semibold text-clay-700 shadow-float ring-1 ring-border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift hover:ring-clay-200"
+      >
+        Ver la sección
+        <span
+          class="grid size-7 place-items-center rounded-full bg-clay-50 transition-colors duration-300 group-hover:bg-clay-400 group-hover:text-clay-950"
+        >
+          <Icon name="arrow" class="size-3.5" />
+        </span>
+      </a>
+    </div>
+
+    {/* ── LA VENTANA ─────────────────────────────────────────── */}
+    <div
+      class="reveal mt-12 overflow-hidden rounded-panel bg-white shadow-lift ring-1 ring-border"
+    >
+      {/* Barra de origen: el dominio real, no una decoración. */}
+      <div
+        class="flex items-center gap-3 border-b border-border bg-paper px-5 py-3.5 sm:px-7"
+      >
+        <span
+          aria-hidden="true"
+          class="grid size-7 shrink-0 place-items-center rounded-full bg-clay-400 text-clay-950"
+        >
+          <Icon name="globe" class="size-3.5" />
+        </span>
+        <span class="truncate text-sm font-semibold text-ink-soft">
+          {portalHost}
+        </span>
+        <a
+          href={SITE.portal.url}
+          rel="noopener"
+          class="group ml-auto flex shrink-0 items-center gap-1.5 text-sm font-semibold text-clay-700"
+        >
+          <span class="link-underline hidden sm:inline">Abrir el portal</span>
+          <Icon
+            name="external"
+            class="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+          />
+        </a>
+      </div>
+
+      <div class="grid lg:grid-cols-[1.05fr_1fr]">
+        {/* Publicación principal, con imagen. Si el portal no la
+            trae, se usa una fotografía del campus. */}
+        {
+          lead && (
+            <article class="group relative border-b border-border lg:border-r lg:border-b-0">
+              <div class="relative aspect-16/10 overflow-hidden lg:aspect-auto lg:h-full lg:min-h-[22rem]">
+                {lead.data.image ? (
+                  <img
+                    src={lead.data.image}
+                    alt={lead.data.imageAlt ?? ''}
+                    loading="lazy"
+                    decoding="async"
+                    class="zoom-soft size-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={campusImage}
+                    alt=""
+                    widths={[640, 1090]}
+                    sizes="(min-width: 1024px) 40rem, 100vw"
+                    loading="lazy"
+                    class="zoom-soft size-full object-cover"
+                  />
+                )}
+
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,42,69,0.05)_0%,rgba(11,42,69,0.55)_52%,rgba(11,42,69,0.92)_100%)]"
+                />
+
+                <div class="absolute inset-x-0 bottom-0 p-7 lg:p-8">
+                  <p class="flex flex-wrap items-center gap-2.5 text-xs">
+                    <span class="eyebrow rounded-full bg-clay-400 px-3 py-1 text-clay-950">
+                      {CONTENT_TYPE_LABELS[lead.data.contentType]}
+                    </span>
+                    <time
+                      datetime={lead.data.publishedAt.toISOString()}
+                      class="tabular text-white/70"
+                    >
+                      {formatDate(lead.data.publishedAt)}
+                    </time>
+                  </p>
+
+                  <h3 class="mt-4 font-display text-2xl leading-tight font-extrabold text-white lg:text-3xl">
+                    <a
+                      href={`/para-docentes/${lead.id}/`}
+                      class="after:absolute after:inset-0"
+                    >
+                      <span class="link-underline">{lead.data.title}</span>
+                    </a>
+                  </h3>
+
+                  {leadExcerpt && (
+                    <p class="mt-3 line-clamp-2 leading-relaxed text-white/75">
+                      {leadExcerpt}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </article>
+          )
+        }
+
+        {/* Las siguientes, como índice de la ventana. */}
+        <ul class="divide-y divide-border">
+          {
+            rest.map((item, index) => {
+              const excerpt = usefulExcerpt(item.data.title, item.data.excerpt);
+
+              return (
+              <li class="reveal-step" style={`--step:${index}`}>
+                <a
+                  href={`/para-docentes/${item.id}/`}
+                  class="group relative flex flex-col gap-2 px-6 py-6 transition-colors duration-300 hover:bg-paper sm:px-7"
+                >
+                  <span
+                    aria-hidden="true"
+                    class="absolute inset-y-0 left-0 w-0 bg-clay-400 transition-all duration-400 ease-out-soft group-hover:w-1"
+                  />
+
+                  <span class="flex flex-wrap items-center gap-2.5 text-xs">
+                    <span class="eyebrow rounded-full bg-clay-50 px-2.5 py-1 text-clay-700">
+                      {CONTENT_TYPE_LABELS[item.data.contentType]}
+                    </span>
+                    <time
+                      datetime={item.data.publishedAt.toISOString()}
+                      class="tabular text-ink-muted"
+                    >
+                      {formatDate(item.data.publishedAt)}
+                    </time>
+                  </span>
+
+                  <span class="flex items-start gap-4">
+                    <span class="min-w-0 flex-1 font-display text-lg leading-snug font-bold text-end-950">
+                      <span class="link-underline">{item.data.title}</span>
+                    </span>
+
+                    <Icon
+                      name="arrow"
+                      class="mt-1 size-4 shrink-0 text-ink-muted transition-all duration-300 group-hover:translate-x-1 group-hover:text-clay-600"
+                    />
+                  </span>
+
+                  {excerpt && (
+                    <span class="line-clamp-2 text-[0.9375rem] leading-relaxed text-ink-soft">
+                      {excerpt}
+                    </span>
+                  )}
+                </a>
+              </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

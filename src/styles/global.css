@@ -1,0 +1,397 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   SISTEMA VISUAL — Caja de Herramientas END
+   ------------------------------------------------------------
+   La plataforma se lee como producto digital, no como portal
+   institucional. Tres decisiones sostienen esa lectura:
+
+     1. NEUTRO FRÍO. El gris de fondo (#F5F8FA) es azulado, no
+        beige. Un neutro cálido arrastra la página hacia lo
+        editorial impreso; el frío la mantiene en pantalla.
+
+     2. PROFUNDIDAD REAL. Hay eje Z: sombras en tres niveles,
+        superficies traslúcidas, halos de color y desenfoque.
+        La jerarquía no la da solo el color, la da la altura.
+
+     3. ACENTOS COMO SEÑAL. Cian y naranja no rellenan áreas:
+        marcan, iluminan y responden al cursor.
+
+   Identidad cromática por área:
+     Recursos      → azul     (end)
+     END Digital   → cian     (teal)
+     Para docentes → naranja  (clay)
+
+   Los tokens viven aquí y NO dentro de los componentes.
+   ============================================================ */
+
+@theme {
+  /* --- Azul institucional: RECURSOS y marca ----------------
+     Anclas de la identidad END: #0877C9 (600) y #0B2A45 (950). */
+  --color-end-50: #eff8ff;
+  --color-end-100: #dcefff;
+  --color-end-200: #b8dfff;
+  --color-end-300: #7ec8fb;
+  --color-end-400: #3aabf2;
+  --color-end-500: #128fdd;
+  --color-end-600: #0877c9; /* Azul END. AA sobre blanco (4.67:1) */
+  --color-end-700: #075ea3;
+  --color-end-800: #0a4c81;
+  --color-end-900: #0d3b62; /* Titulares */
+  --color-end-950: #0b2a45; /* Azul profundo: suelo de marca */
+
+  /* --- Cian / turquesa: END DIGITAL ------------------------
+     Ancla #45C7C8 (400). Es un color de luz: brilla sobre
+     fondo oscuro y marca sobre fondo claro, pero como texto
+     necesita bajar a 700 para superar AA. */
+  --color-teal-50: #edfbfb;
+  --color-teal-100: #d2f5f5;
+  --color-teal-200: #a8ebec;
+  --color-teal-300: #74dcdd;
+  --color-teal-400: #45c7c8; /* Cian END */
+  --color-teal-500: #22a9ab;
+  --color-teal-600: #148789;
+  --color-teal-700: #136c6e; /* Primer tono AA sobre blanco (6.18:1) */
+  --color-teal-800: #145658;
+  --color-teal-900: #144849;
+  --color-teal-950: #062e30;
+
+  /* --- Naranja: PARA DOCENTES -------------------------------
+     Ancla #F28C52 (400). El único color cálido del sistema:
+     por eso se reserva a un área y no se reparte. */
+  --color-clay-50: #fff5ef;
+  --color-clay-100: #ffe8d9;
+  --color-clay-200: #fecdb0;
+  --color-clay-300: #f8ab7e;
+  --color-clay-400: #f28c52; /* Naranja END */
+  --color-clay-500: #e26a2b;
+  --color-clay-600: #c4501a; /* Primer tono AA sobre blanco (4.66:1) */
+  --color-clay-700: #9f3f18;
+  --color-clay-800: #7f351a;
+  --color-clay-900: #672e19;
+  --color-clay-950: #37150a;
+
+  /* --- Superficies: neutro FRÍO ---------------------------- */
+  --color-surface: #ffffff;
+  --color-paper: #f5f8fa; /* Gris muy claro, azulado */
+  --color-paper-deep: #e9eff5;
+  --color-border: #e2e9f0;
+  --color-border-strong: #c8d4e0;
+  --color-outline: #7b8a9a; /* 3:1 sobre blanco: contornos de control */
+
+  /* --- Texto ----------------------------------------------- */
+  --color-ink: #101c2a;
+  --color-ink-soft: #3a4a5f;
+  --color-ink-muted: #5c6b7f; /* AA sobre blanco (5.44) y papel (5.10) */
+
+  /* --- Tipografía ------------------------------------------ */
+  --font-display: 'Montserrat Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Work Sans Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: clamp(2.5rem, 7vw, 5.25rem);
+  --text-display--line-height: 0.96;
+  --text-display--letter-spacing: -0.04em;
+
+  --text-title: clamp(2rem, 4vw, 3.125rem);
+  --text-title--line-height: 1.04;
+  --text-title--letter-spacing: -0.032em;
+
+  --text-section: clamp(1.5rem, 2.6vw, 2.125rem);
+  --text-section--line-height: 1.12;
+  --text-section--letter-spacing: -0.025em;
+
+  --text-row: clamp(1.25rem, 2.2vw, 1.75rem);
+  --text-row--line-height: 1.2;
+  --text-row--letter-spacing: -0.02em;
+
+  /* --- Radios ----------------------------------------------
+     Más generosos que antes: el radio pequeño lee como
+     documento; el amplio, como superficie de software. */
+  --radius-control: 0.875rem;
+  --radius-card: 1.125rem;
+  --radius-panel: 1.75rem;
+  --radius-hero: 2.25rem;
+
+  /* --- Elevación -------------------------------------------
+     Tres alturas reales, todas tintadas con el azul profundo
+     para que la sombra pertenezca a la paleta y no sea gris.  */
+  --shadow-float:
+    0 1px 2px rgb(11 42 69 / 0.04), 0 6px 16px -6px rgb(11 42 69 / 0.10),
+    0 18px 36px -20px rgb(11 42 69 / 0.14);
+  --shadow-lift:
+    0 2px 4px rgb(11 42 69 / 0.05), 0 12px 28px -10px rgb(11 42 69 / 0.14),
+    0 36px 64px -32px rgb(11 42 69 / 0.20);
+  --shadow-hover:
+    0 4px 8px rgb(11 42 69 / 0.06), 0 20px 44px -12px rgb(11 42 69 / 0.20),
+    0 56px 90px -40px rgb(11 42 69 / 0.28);
+  --shadow-dialog: 0 40px 90px -24px rgb(11 42 69 / 0.42);
+
+  /* Halos: elevación teñida de acento, para piezas vivas. */
+  --shadow-glow-teal: 0 18px 50px -18px rgb(69 199 200 / 0.55);
+  --shadow-glow-end: 0 18px 50px -18px rgb(8 119 201 / 0.45);
+  --shadow-glow-clay: 0 18px 50px -18px rgb(242 140 82 / 0.45);
+
+  /* --- Movimiento ------------------------------------------ */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --animate-drift: drift 14s ease-in-out infinite;
+  --animate-drift-slow: drift 22s ease-in-out infinite;
+  --animate-rise: rise 0.7s var(--ease-out-soft) both;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -3%, 0) scale(1.06);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-end-950);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-teal-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .on-dark :focus-visible,
+  .on-dark:focus-visible {
+    outline-color: var(--color-teal-300);
+  }
+
+  ::selection {
+    background-color: var(--color-teal-200);
+    color: var(--color-end-950);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Antetítulo: versalita ancha, nunca decorativa sola. */
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .rule {
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* ---------- PROFUNDIDAD -------------------------------- */
+
+  /* Superficie traslúcida sobre fondo claro. El borde superior
+     más luminoso simula que la luz cae desde arriba. */
+  .glass {
+    background: color-mix(in srgb, white 72%, transparent);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgb(255 255 255 / 0.9);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.85),
+      var(--shadow-float);
+  }
+
+  /* Su equivalente sobre fondo profundo. */
+  .glass-dark {
+    background: rgb(255 255 255 / 0.07);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid rgb(255 255 255 / 0.14);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+  }
+
+  /* Malla de puntos: textura de fondo, casi imperceptible.
+     Da grano al lienzo sin dibujar nada reconocible. */
+  .dot-grid {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      color-mix(in srgb, var(--color-end-950) 12%, transparent) 1px,
+      transparent 0
+    );
+    background-size: 28px 28px;
+  }
+
+  .dot-grid-dark {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgb(255 255 255 / 0.09) 1px,
+      transparent 0
+    );
+    background-size: 28px 28px;
+  }
+
+  /* Orbe difuminado: la fuente de color del lienzo. Siempre
+     detrás del contenido y siempre `aria-hidden`. */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(72px);
+    opacity: 0.55;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* Recorte orgánico: la fotografía deja de ser un rectángulo
+     sin recurrir a una máscara SVG externa. */
+  .mask-blob {
+    border-radius: 46% 54% 52% 48% / 40% 38% 62% 60%;
+  }
+
+  .mask-blob-alt {
+    border-radius: 58% 42% 38% 62% / 52% 48% 52% 48%;
+  }
+
+  /* ---------- MICROINTERACCIONES -------------------------- */
+
+  /* Pieza que se despega al pasar el cursor. */
+  .lift {
+    transition:
+      transform 0.45s var(--ease-out-soft),
+      box-shadow 0.45s var(--ease-out-soft),
+      border-color 0.35s var(--ease-out-soft);
+  }
+
+  .lift:hover,
+  .group:hover .lift {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Zoom extremadamente sutil sobre fotografía. */
+  .zoom-soft {
+    transition: transform 0.9s var(--ease-out-soft);
+  }
+
+  .group:hover .zoom-soft {
+    transform: scale(1.045);
+  }
+
+  /* Subrayado que crece: microinteracción por defecto de los
+     enlaces de texto. */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1.5px;
+    transition: background-size 0.35s var(--ease-out-soft);
+  }
+
+  .link-underline:hover,
+  .group:hover .link-underline {
+    background-size: 100% 1.5px;
+  }
+
+  /* Aparición progresiva. El estado oculto solo existe si hay
+     JavaScript capaz de revelarlo. */
+  .js-reveal .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.65s var(--ease-out-soft),
+      transform 0.65s var(--ease-out-soft);
+  }
+
+  .js-reveal .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Escalonado dentro de un grupo revelado. */
+  .js-reveal .reveal-step {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.6s var(--ease-out-soft),
+      transform 0.6s var(--ease-out-soft);
+    transition-delay: calc(var(--step, 0) * 70ms);
+  }
+
+  .js-reveal .is-visible .reveal-step,
+  .js-reveal .reveal-step.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}

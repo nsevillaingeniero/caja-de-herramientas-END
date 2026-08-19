@@ -1,0 +1,156 @@
+---
+import type { GetStaticPaths } from 'astro';
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import TeacherContentCard from '../../components/teacher/TeacherContentCard.astro';
+import Button from '../../components/primitives/Button.astro';
+import Icon from '../../components/primitives/Icon.astro';
+
+import { SITE } from '../../config/site.mjs';
+import {
+  getTeacherContent,
+  CONTENT_TYPE_LABELS,
+  formatDate,
+  type TeacherContent,
+} from '../../lib/content';
+
+interface Props {
+  item: TeacherContent;
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const items = await getTeacherContent();
+  return items.map((item) => ({
+    params: { slug: item.id },
+    props: { item },
+  }));
+};
+
+const { item } = Astro.props;
+const { data } = item;
+
+// Relacionados: mismo tema del portal, excluyendo el actual.
+const all = await getTeacherContent();
+const related = all
+  .filter(
+    (other) =>
+      other.id !== item.id && other.data.sourceTopicId === data.sourceTopicId,
+  )
+  .slice(0, 3);
+
+/**
+ * Algunas publicaciones del portal no traen descripción y el resumen
+ * cae al título. Para esas, se compone una descripción con datos
+ * verificables (tema y entidad) en lugar de repetir el título.
+ */
+const isBareTitle = data.excerpt.trim() === data.title.trim();
+
+const metaDescription =
+  !isBareTitle && data.excerpt.length >= 60
+    ? data.excerpt
+    : `${data.title}. Publicación de ${data.sourceTopic} de la ${SITE.institutionShort}.`;
+---
+
+<BaseLayout title={data.title} description={metaDescription} image={data.image}
+  noindex
+>
+  <PageHeader
+    eyebrow={CONTENT_TYPE_LABELS[data.contentType]}
+    title={data.title}
+    accent="clay"
+    tone="deep"
+    breadcrumbs={[
+      { href: '/', label: 'Inicio' },
+      { href: '/para-docentes/', label: 'Para docentes' },
+    ]}
+  >
+    <p
+      class="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.9375rem] text-white/70"
+    >
+      <time datetime={data.publishedAt.toISOString()} class="tabular">
+        {formatDate(data.publishedAt)}
+      </time>
+      <span aria-hidden="true">·</span>
+      <span>{data.sourceTopic}</span>
+    </p>
+  </PageHeader>
+
+  <article class="mx-auto max-w-3xl px-5 py-14 sm:px-8 lg:py-16">
+    {
+      data.image && (
+        <img
+          src={data.image}
+          alt={data.imageAlt ?? ''}
+          loading="eager"
+          decoding="async"
+          class="aspect-[16/9] w-full rounded-card bg-paper-deep object-cover"
+        />
+      )
+    }
+
+    {
+      !isBareTitle && (
+        <p class:list={['text-xl leading-relaxed text-ink-soft', data.image && 'mt-10']}>
+          {data.excerpt}
+        </p>
+      )
+    }
+
+    <!-- El contenido completo vive en el portal: aquí se enlaza, no se copia. -->
+    <aside
+      class="on-dark mt-12 rounded-panel bg-clay-950 p-8 text-white lg:p-10"
+      aria-labelledby="fuente"
+    >
+      <p class="eyebrow text-clay-200">Fuente oficial</p>
+
+      <h2 id="fuente" class="mt-4 font-display text-2xl font-extrabold text-white">
+        Este contenido lo publica la {SITE.institutionShort}
+      </h2>
+
+      <p class="mt-4 leading-relaxed text-white/75">
+        Aquí ves la referencia. La publicación completa —y actualizada— vive en
+        el portal oficial, que es la fuente autorizada.
+      </p>
+
+      <div class="mt-7">
+        <Button href={data.sourceUrl} external size="md" onDark variant="clay">
+          Leer en el portal END
+        </Button>
+      </div>
+
+      {
+        data.updatedAt && (
+          <p class="mt-6 flex items-center gap-2 text-sm text-white/55">
+            <Icon name="clock" class="size-3.5 shrink-0" />
+            Última actualización en el portal: {formatDate(data.updatedAt)}
+          </p>
+        )
+      }
+    </aside>
+
+    {
+      related.length > 0 && (
+        <section
+          aria-labelledby="relacionados-portal"
+          class="mt-16 border-t border-border pt-12"
+        >
+          <h2
+            id="relacionados-portal"
+            class="font-display text-2xl font-extrabold text-end-900"
+          >
+            Más de {data.sourceTopic}
+          </h2>
+
+          <ul class="mt-8 grid gap-x-8 gap-y-10 sm:grid-cols-2">
+            {related.map((other) => (
+              <li>
+                <TeacherContentCard item={other} class="h-full" />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>

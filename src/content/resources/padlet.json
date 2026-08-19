@@ -1,0 +1,24 @@
+{
+  "name": "Padlet",
+  "shortDescription": "Un muro colaborativo donde el grupo publica ideas, imágenes y enlaces en un mismo espacio.",
+  "description": "Padlet es un tablero digital compartido: los estudiantes publican notas, imágenes, enlaces, audio o video sobre un lienzo común, y todos ven los aportes aparecer en vivo.\n\nFunciona bien para lluvias de ideas, galerías de trabajos, líneas de tiempo colectivas y bitácoras de proceso. Los estudiantes pueden participar sin registrarse, lo que reduce la fricción al empezar.",
+  "activities": [
+    "Lluvias de ideas colectivas",
+    "Galerías de trabajos del grupo",
+    "Muros de preguntas y dudas",
+    "Bitácoras de proceso",
+    "Mapas y líneas de tiempo colaborativas"
+  ],
+  "modality": "multiplataforma",
+  "pricing": "freemium",
+  "pricingNote": "El plan gratuito permite un número limitado de muros activos.",
+  "categories": ["colaboracion", "comunicacion", "actividades-interactivas"],
+  "moodleIntegration": "embed",
+  "moodleUsage": "Copia el código de inserción de Padlet y pégalo en una «Página» del curso desde el editor HTML, para que el muro quede dentro de END Digital sin salir a otra pestaña.",
+  "languages": ["Español", "Inglés"],
+  "url": "https://padlet.com",
+  "intents": ["crear-actividad", "promover-participacion"],
+  "tags": ["colaboración", "muro", "lluvia de ideas", "participación"],
+  "featured": false,
+  "order": 6
+}

@@ -1,0 +1,77 @@
+[
+  {
+    "id": "usar-ia",
+    "label": "Utilizar inteligencia artificial",
+    "pageTitle": "Quiero utilizar inteligencia artificial",
+    "icon": "bot",
+    "description": "Apóyate en la IA para preparar clases, generar materiales y ahorrar tiempo.",
+    "matchCategories": ["inteligencia-artificial"],
+    "matchTags": ["ia", "chatbot", "generativa"],
+    "accent": "teal",
+    "order": 1
+  },
+  {
+    "id": "crear-actividad",
+    "label": "Crear una actividad",
+    "pageTitle": "Quiero crear una actividad",
+    "icon": "gamepad",
+    "description": "Diseña experiencias donde tus estudiantes hagan, no solo lean.",
+    "matchCategories": ["actividades-interactivas", "colaboracion"],
+    "matchTags": ["gamificación", "interactivo", "actividad"],
+    "accent": "end",
+    "order": 2
+  },
+  {
+    "id": "evaluar",
+    "label": "Evaluar a mis estudiantes",
+    "pageTitle": "Quiero evaluar a mis estudiantes",
+    "icon": "square-pen",
+    "description": "Construye cuestionarios, rúbricas y evaluaciones significativas.",
+    "matchCategories": ["evaluacion", "calificaciones"],
+    "matchTags": ["cuestionario", "rúbrica", "examen"],
+    "accent": "end",
+    "order": 3
+  },
+  {
+    "id": "promover-participacion",
+    "label": "Promover la participación",
+    "pageTitle": "Quiero promover la participación",
+    "icon": "message-circle",
+    "description": "Rompe el silencio del aula y haz que todos tengan voz.",
+    "matchCategories": [
+      "encuestas-y-votaciones",
+      "comunicacion",
+      "colaboracion"
+    ],
+    "matchTags": ["participación", "encuesta", "foro"],
+    "accent": "clay",
+    "order": 4
+  },
+  {
+    "id": "crear-contenidos",
+    "label": "Crear contenidos",
+    "pageTitle": "Quiero crear contenidos",
+    "icon": "palette",
+    "description": "Produce materiales visuales, video y presentaciones con buen acabado.",
+    "matchCategories": ["creacion-de-contenidos", "recursos-educativos"],
+    "matchTags": ["diseño", "video", "presentación"],
+    "accent": "clay",
+    "order": 5
+  },
+  {
+    "id": "aprender-moodle",
+    "label": "Aprender END Digital",
+    "pageTitle": "Quiero aprender END Digital",
+    "icon": "graduation-cap",
+    "description": "Domina tu aula virtual desde lo básico hasta lo avanzado.",
+    "matchCategories": [
+      "primeros-pasos",
+      "configuracion-del-curso",
+      "gestion-de-estudiantes",
+      "buenas-practicas"
+    ],
+    "matchTags": ["moodle", "aula virtual"],
+    "accent": "teal",
+    "order": 6
+  }
+]

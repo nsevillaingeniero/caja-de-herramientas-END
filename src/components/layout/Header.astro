@@ -1,0 +1,149 @@
+---
+import Brand from './Brand.astro';
+import Icon from '../primitives/Icon.astro';
+import SearchTrigger from '../search/SearchTrigger.astro';
+import { VISIBLE_AREAS, accent } from '../../lib/accents';
+
+/** Inicio + las tres áreas. El orden y los nombres vienen de `AREAS`. */
+const NAV = [
+  { href: '/', label: 'Inicio', accent: 'slate' },
+  ...VISIBLE_AREAS.map((area) => ({
+    href: area.href,
+    label: area.label,
+    accent: area.accent,
+  })),
+  // La capacitación no es un área de contenido de la plataforma: es
+  // el plan vigente de acompañamiento docente. Por eso se declara
+  // aquí y no en `AREAS`.
+  { href: '/capacitacion/', label: 'Capacitación', accent: 'teal' },
+];
+
+const path = Astro.url.pathname;
+
+/** Marca activa la sección actual, incluidas sus páginas internas. */
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+
+<header class="sticky top-0 z-50 border-b border-border bg-white/90 backdrop-blur-md">
+  <div class="mx-auto flex h-[4.5rem] max-w-[78rem] items-center gap-6 px-5 sm:px-8">
+    <Brand />
+
+    <!-- Navegación de escritorio: el subrayado activo lleva el color
+         del área, de modo que el sitio dice dónde estás sin depender
+         solo del peso tipográfico. -->
+    <nav aria-label="Navegación principal" class="ml-auto hidden lg:block">
+      <ul class="flex items-center gap-7">
+        {
+          NAV.map((item) => {
+            const active = isActive(item.href);
+            const tone = accent(item.accent);
+
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={active ? 'page' : undefined}
+                  class:list={[
+                    'relative block py-1 text-[0.9375rem] font-semibold transition-colors',
+                    active ? 'text-end-900' : 'text-ink-soft hover:text-end-900',
+                  ]}
+                >
+                  {item.label}
+                  <span
+                    class:list={[
+                      'absolute -bottom-0.5 left-0 h-[2.5px] rounded-full transition-all duration-300',
+                      tone.rule,
+                      active ? 'w-full' : 'w-0',
+                    ]}
+                  />
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    <div class="ml-auto flex items-center gap-2 lg:ml-0">
+      <SearchTrigger />
+
+      <button
+        type="button"
+        id="nav-toggle"
+        class="grid size-10 place-items-center rounded-control text-ink transition-colors hover:bg-paper-deep lg:hidden"
+        aria-expanded="false"
+        aria-controls="nav-mobile"
+      >
+        <span class="sr-only">Abrir menú de navegación</span>
+        <Icon name="menu" class="size-5" id="nav-icon-open" />
+        <Icon name="close" class="hidden size-5" id="nav-icon-close" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Navegación móvil -->
+  <nav
+    id="nav-mobile"
+    aria-label="Navegación principal (móvil)"
+    class="hidden border-t border-border bg-white lg:hidden"
+  >
+    <ul class="mx-auto max-w-[78rem] px-5 py-2 sm:px-8">
+      {
+        NAV.map((item) => {
+          const active = isActive(item.href);
+          const tone = accent(item.accent);
+
+          return (
+            <li class="border-b border-border last:border-0">
+              <a
+                href={item.href}
+                aria-current={active ? 'page' : undefined}
+                class="flex items-center gap-3 py-3.5 text-base font-semibold text-end-900"
+              >
+                <span
+                  class:list={[
+                    'h-5 w-[3px] rounded-full transition-colors',
+                    active ? tone.rule : 'bg-transparent',
+                  ]}
+                  aria-hidden="true"
+                />
+                {item.label}
+                <Icon
+                  name="chevron-right"
+                  class="ml-auto size-4 text-ink-muted"
+                />
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const menu = document.getElementById('nav-mobile');
+  const iconOpen = document.getElementById('nav-icon-open');
+  const iconClose = document.getElementById('nav-icon-close');
+
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+
+    toggle.setAttribute('aria-expanded', String(!open));
+    menu?.classList.toggle('hidden', open);
+    iconOpen?.classList.toggle('hidden', !open);
+    iconClose?.classList.toggle('hidden', open);
+  });
+
+  // Cierra el menú al pasar a escritorio, para no dejar estado inconsistente.
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => {
+    if (event.matches) {
+      toggle?.setAttribute('aria-expanded', 'false');
+      menu?.classList.add('hidden');
+      iconOpen?.classList.remove('hidden');
+      iconClose?.classList.add('hidden');
+    }
+  });
+</script>

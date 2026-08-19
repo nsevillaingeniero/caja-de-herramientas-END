@@ -1,0 +1,190 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import TutorialRow from '../../components/tutorials/TutorialRow.astro';
+import Icon from '../../components/primitives/Icon.astro';
+
+import {
+  formatDuration,
+  getFeaturedTutorial,
+  getTutorialPaths,
+  getTutorials,
+  LEVEL_LABELS,
+} from '../../lib/content';
+
+const [tutorials, paths, featured] = await Promise.all([
+  getTutorials(),
+  getTutorialPaths(),
+  getFeaturedTutorial(),
+]);
+
+const totalMinutes = tutorials.reduce((sum, t) => sum + t.data.duration, 0);
+---
+
+<BaseLayout
+  title="END Digital"
+  description="Aprende a utilizar y aprovechar tu aula virtual. Tutoriales en video y guías paso a paso sobre Moodle para docentes de la Escuela Nacional del Deporte."
+>
+  <PageHeader
+    eyebrow="Aula virtual"
+    title="END Digital"
+    description="Aprende a utilizar y aprovechar tu aula virtual. Los tutoriales están organizados como rutas: puedes seguirlas en orden o entrar directo a lo que necesitas resolver."
+    accent="teal"
+    tone="deep"
+    breadcrumbs={[{ href: '/', label: 'Inicio' }]}
+  >
+    <dl slot="aside" class="flex shrink-0 gap-10">
+      <div>
+        <dd class="tabular font-display text-5xl font-extrabold text-teal-300">
+          {tutorials.length}
+        </dd>
+        <dt class="mt-1 text-sm font-semibold tracking-wide text-white/60">
+          tutoriales
+        </dt>
+      </div>
+      <div>
+        <dd class="tabular font-display text-5xl font-extrabold text-teal-300">
+          {formatDuration(totalMinutes)}
+        </dd>
+        <dt class="mt-1 text-sm font-semibold tracking-wide text-white/60">
+          en total
+        </dt>
+      </div>
+    </dl>
+  </PageHeader>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-14 sm:px-8 lg:py-16">
+    <!-- Punto de entrada evidente para quien nunca ha usado el aula. -->
+    {
+      featured && (
+        <section aria-labelledby="destacado" class="reveal">
+          <h2 id="destacado" class="sr-only">
+            Por dónde empezar
+          </h2>
+
+          <article class="group relative overflow-hidden rounded-panel bg-paper p-8 lg:p-11">
+            <span
+              aria-hidden="true"
+              class="absolute inset-y-0 left-0 w-1.5 bg-teal-500"
+            />
+
+            <div class="grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+              <div>
+                <p class="eyebrow text-teal-700">Empieza por aquí</p>
+
+                <h3 class="mt-4 font-display text-title font-extrabold text-end-900">
+                  <a
+                    href={`/end-digital/${featured.id}/`}
+                    class="after:absolute after:inset-0"
+                  >
+                    <span class="link-underline">{featured.data.title}</span>
+                  </a>
+                </h3>
+
+                <p class="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
+                  {featured.data.description}
+                </p>
+
+                <p class="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2 text-ink-muted">
+                  <span class="font-semibold text-ink">
+                    {LEVEL_LABELS[featured.data.level]}
+                  </span>
+                  <span aria-hidden="true">·</span>
+                  <span class="tabular">
+                    {formatDuration(featured.data.duration)}
+                  </span>
+                  {featured.data.video && (
+                    <>
+                      <span aria-hidden="true">·</span>
+                      <span class="inline-flex items-center gap-1.5">
+                        <Icon name="circle-play" class="size-4" />
+                        Con video
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div>
+
+              {/* Los pasos del tutorial destacado: se ve qué se va a
+                  aprender antes de entrar. */}
+              {featured.data.steps.length > 0 && (
+                <ol class="border-t border-clay-200/70 pt-6 lg:border-t-0 lg:border-l lg:border-border lg:pt-0 lg:pl-10">
+                  {featured.data.steps.slice(0, 5).map((step, index) => (
+                    <li class="flex gap-4 py-2.5 text-[0.9375rem] text-ink-soft">
+                      <span
+                        aria-hidden="true"
+                        class="tabular shrink-0 font-display text-sm font-bold text-teal-700"
+                      >
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          </article>
+        </section>
+      )
+    }
+
+    <!-- Rutas: cada categoría es una secuencia con su propio orden. -->
+    <section aria-labelledby="rutas" class="mt-20">
+      <div aria-hidden="true" class="h-[3px] w-12 rounded-full bg-teal-500"></div>
+      <h2
+        id="rutas"
+        class="mt-5 font-display text-title font-extrabold text-end-900"
+      >
+        Rutas de aprendizaje
+      </h2>
+      <p class="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">
+        Cada ruta agrupa los tutoriales de un mismo tema en el orden en que
+        conviene seguirlos.
+      </p>
+
+      <div class="mt-14 space-y-16">
+        {
+          paths.map(({ category, tutorials: items }) => (
+            <section aria-labelledby={`ruta-${category.id}`} class="reveal">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3">
+                <div class="max-w-2xl">
+                  <h3
+                    id={`ruta-${category.id}`}
+                    class="inline-flex items-center gap-2.5 font-display text-2xl font-extrabold text-end-900"
+                  >
+                    <Icon name={category.data.icon} class="size-5 text-teal-700" />
+                    {category.data.name}
+                  </h3>
+                  <p class="mt-2.5 leading-relaxed text-ink-soft">
+                    {category.data.description}
+                  </p>
+                </div>
+
+                <a
+                  href={`/end-digital/categoria/${category.id}/`}
+                  class="group inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-teal-700"
+                >
+                  <span class="link-underline">
+                    {items.length} {items.length === 1 ? 'tutorial' : 'tutoriales'}
+                  </span>
+                  <Icon
+                    name="arrow"
+                    class="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                  />
+                </a>
+              </div>
+
+              <ul class="mt-7 border-t border-border">
+                {items.map((tutorial, index) => (
+                  <li class="border-b border-border">
+                    <TutorialRow tutorial={tutorial} index={index + 1} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</BaseLayout>

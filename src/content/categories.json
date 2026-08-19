@@ -1,0 +1,177 @@
+[
+  {
+    "id": "inteligencia-artificial",
+    "name": "Inteligencia Artificial",
+    "description": "Herramientas de IA para planear clases, generar materiales y acompañar el aprendizaje.",
+    "icon": "sparkles",
+    "accent": "teal",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 1
+  },
+  {
+    "id": "creacion-de-contenidos",
+    "name": "Creación de contenidos",
+    "description": "Diseña presentaciones, infografías, video y materiales visuales para tus clases.",
+    "icon": "palette",
+    "accent": "clay",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 2
+  },
+  {
+    "id": "actividades-interactivas",
+    "name": "Actividades interactivas",
+    "description": "Convierte tus contenidos en experiencias donde el estudiante participa.",
+    "icon": "puzzle",
+    "accent": "end",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 3
+  },
+  {
+    "id": "evaluacion",
+    "name": "Evaluación",
+    "description": "Diseña cuestionarios, rúbricas y estrategias para valorar el aprendizaje.",
+    "icon": "clipboard-check",
+    "accent": "end",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 4
+  },
+  {
+    "id": "encuestas-y-votaciones",
+    "name": "Encuestas y votaciones",
+    "description": "Toma el pulso del grupo y recoge opiniones en tiempo real.",
+    "icon": "chart-bar",
+    "accent": "teal",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 5
+  },
+  {
+    "id": "colaboracion",
+    "name": "Colaboración y trabajo en equipo",
+    "description": "Espacios donde los estudiantes construyen y producen en conjunto.",
+    "icon": "users",
+    "accent": "clay",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 6
+  },
+  {
+    "id": "comunicacion",
+    "name": "Comunicación",
+    "description": "Mantén el canal abierto con tus estudiantes dentro y fuera del aula.",
+    "icon": "chat",
+    "accent": "end",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 7
+  },
+  {
+    "id": "videoconferencia",
+    "name": "Videoconferencia",
+    "description": "Encuentros sincrónicos, clases remotas y grabación de sesiones.",
+    "icon": "video",
+    "accent": "slate",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 8
+  },
+  {
+    "id": "accesibilidad-e-inclusion",
+    "name": "Accesibilidad e inclusión",
+    "description": "Recursos para que todos tus estudiantes puedan acceder y participar.",
+    "icon": "accessibility",
+    "accent": "teal",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 9
+  },
+  {
+    "id": "recursos-educativos",
+    "name": "Recursos educativos",
+    "description": "Bancos de contenidos abiertos, imágenes y materiales listos para usar.",
+    "icon": "book",
+    "accent": "slate",
+    "appliesTo": [
+      "resource",
+      "tutorial"
+    ],
+    "order": 10
+  },
+  {
+    "id": "primeros-pasos",
+    "name": "Primeros pasos",
+    "description": "Lo esencial para empezar a moverte con confianza en END Digital.",
+    "icon": "compass",
+    "accent": "end",
+    "appliesTo": [
+      "tutorial"
+    ],
+    "order": 11
+  },
+  {
+    "id": "configuracion-del-curso",
+    "name": "Configuración del curso",
+    "description": "Deja tu aula virtual organizada, clara y lista para el semestre.",
+    "icon": "settings",
+    "accent": "slate",
+    "appliesTo": [
+      "tutorial"
+    ],
+    "order": 12
+  },
+  {
+    "id": "calificaciones",
+    "name": "Calificaciones",
+    "description": "Configura el libro de calificaciones y comunica resultados.",
+    "icon": "calculator",
+    "accent": "end",
+    "appliesTo": [
+      "tutorial"
+    ],
+    "order": 13
+  },
+  {
+    "id": "gestion-de-estudiantes",
+    "name": "Gestión de estudiantes",
+    "description": "Matrículas, grupos, seguimiento y acompañamiento del grupo.",
+    "icon": "user-check",
+    "accent": "teal",
+    "appliesTo": [
+      "tutorial"
+    ],
+    "order": 14
+  },
+  {
+    "id": "buenas-practicas",
+    "name": "Buenas prácticas",
+    "description": "Recomendaciones para que tu aula virtual funcione mejor.",
+    "icon": "lightbulb",
+    "accent": "clay",
+    "appliesTo": [
+      "tutorial"
+    ],
+    "order": 15
+  }
+]

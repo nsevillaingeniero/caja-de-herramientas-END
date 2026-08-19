@@ -1,0 +1,81 @@
+---
+import type { GetStaticPaths } from 'astro';
+
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHeader from '../../../components/shared/PageHeader.astro';
+import ResourceExplorer from '../../../components/resources/ResourceExplorer.astro';
+
+import { getCategories, getResources, type Category } from '../../../lib/content';
+
+interface Props {
+  category: Category;
+}
+
+/**
+ * Vista filtrada por categoría con URL propia y compartible.
+ * Solo se generan las categorías que tienen recursos.
+ */
+export const getStaticPaths: GetStaticPaths = async () => {
+  const [categories, resources] = await Promise.all([
+    getCategories('resource'),
+    getResources(),
+  ]);
+
+  return categories
+    .filter((category) =>
+      resources.some((resource) =>
+        resource.data.categories.some((ref) => ref.id === category.id),
+      ),
+    )
+    .map((category) => ({
+      params: { slug: category.id },
+      props: { category },
+    }));
+};
+
+const { category } = Astro.props;
+
+const [allResources, categories] = await Promise.all([
+  getResources(),
+  getCategories(),
+]);
+
+const resources = allResources.filter((resource) =>
+  resource.data.categories.some((ref) => ref.id === category.id),
+);
+---
+
+<BaseLayout
+  title={category.data.name}
+  description={category.data.description}
+>
+  <PageHeader
+    eyebrow="Recursos"
+    title={category.data.name}
+    description={category.data.description}
+    accent="end"
+    tone="deep"
+    breadcrumbs={[
+      { href: '/', label: 'Inicio' },
+      { href: '/recursos/', label: 'Recursos' },
+    ]}
+  >
+    <p
+      slot="aside"
+      class="tabular shrink-0 font-display text-5xl font-extrabold text-end-300"
+    >
+      {resources.length}
+      <span class="mt-1 block text-sm font-semibold tracking-wide text-white/60">
+        {resources.length === 1 ? 'herramienta' : 'herramientas'}
+      </span>
+    </p>
+  </PageHeader>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-14 sm:px-8 lg:py-16">
+    <ResourceExplorer
+      resources={resources}
+      categories={categories}
+      activeCategory={category.id}
+    />
+  </div>
+</BaseLayout>

@@ -1,0 +1,192 @@
+---
+import type { GetStaticPaths } from 'astro';
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/shared/PageHeader.astro';
+import RelatedContent from '../../components/shared/RelatedContent.astro';
+import ResourceMark from '../../components/resources/ResourceMark.astro';
+import Button from '../../components/primitives/Button.astro';
+import Icon from '../../components/primitives/Icon.astro';
+
+import {
+  getResources,
+  resolveCategories,
+  MODALITY_LABELS,
+  MOODLE_LABELS,
+  PRICING_LABELS,
+  type Resource,
+} from '../../lib/content';
+import { getRelatedToResource } from '../../lib/relations';
+import type { Accent } from '../../lib/accents';
+
+interface Props {
+  resource: Resource;
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const resources = await getResources();
+  return resources.map((resource) => ({
+    params: { slug: resource.id },
+    props: { resource },
+  }));
+};
+
+const { resource } = Astro.props;
+const { data } = resource;
+
+const [categories, related] = await Promise.all([
+  resolveCategories(data.categories),
+  getRelatedToResource(resource),
+]);
+
+// Ficha técnica: pares etiqueta/valor mostrados como lista de definición.
+const specs = [
+  { label: 'Modalidad', value: MODALITY_LABELS[data.modality] },
+  {
+    label: 'Precio',
+    value: PRICING_LABELS[data.pricing],
+    note: data.pricingNote,
+  },
+  { label: 'En END Digital', value: MOODLE_LABELS[data.moodleIntegration] },
+  { label: 'Idiomas', value: data.languages.join(', ') },
+];
+---
+
+<BaseLayout title={data.name} description={data.shortDescription}>
+  <PageHeader
+    eyebrow={categories[0]?.data.name}
+    title={data.name}
+    description={data.shortDescription}
+    accent="end"
+    tone="deep"
+    breadcrumbs={[
+      { href: '/', label: 'Inicio' },
+      { href: '/recursos/', label: 'Recursos' },
+    ]}
+  >
+    <ResourceMark
+      slot="aside"
+      name={data.name}
+      logo={data.logo}
+      accent={categories[0]?.data.accent as Accent}
+      size="lg"
+      class="ring-1 ring-white/20"
+    />
+
+    <div class="mt-9 flex flex-wrap items-center gap-3">
+      <Button href={data.url} external size="md" onDark>
+        Abrir {data.name}
+      </Button>
+
+      {
+        data.externalGuide && (
+          <Button
+            href={data.externalGuide}
+            external
+            variant="secondary"
+            size="md"
+            onDark
+          >
+            Guía oficial
+          </Button>
+        )
+      }
+    </div>
+  </PageHeader>
+
+  <div class="mx-auto max-w-[78rem] px-5 py-14 sm:px-8 lg:py-16">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
+      <div>
+        <section aria-labelledby="descripcion">
+          <h2
+            id="descripcion"
+            class="font-display text-2xl font-extrabold text-end-900"
+          >
+            Qué es
+          </h2>
+          <div class="mt-5 space-y-5 text-lg leading-relaxed text-ink-soft">
+            {data.description.split('\n\n').map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+        </section>
+
+        <section aria-labelledby="actividades" class="mt-14">
+          <h2
+            id="actividades"
+            class="font-display text-2xl font-extrabold text-end-900"
+          >
+            Qué puedes crear
+          </h2>
+          <ul class="mt-6 border-t border-border">
+            {
+              data.activities.map((activity) => (
+                <li class="flex items-start gap-3.5 border-b border-border py-4 text-ink-soft">
+                  <Icon name="check" class="mt-1 size-4 shrink-0 text-end-600" />
+                  {activity}
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <!-- El "cómo usarlo en END Digital" es la información propia de
+             esta plataforma: lleva el color del área que le corresponde. -->
+        <section aria-labelledby="moodle" class="mt-14">
+          <div class="on-dark rounded-panel bg-teal-950 p-8 text-white lg:p-10">
+            <p class="eyebrow text-teal-300">END Digital</p>
+            <h2 id="moodle" class="mt-4 font-display text-2xl font-extrabold text-white">
+              Cómo usarlo en tu aula virtual
+            </h2>
+            <p class="mt-5 text-lg leading-relaxed text-white/80">
+              {data.moodleUsage}
+            </p>
+          </div>
+        </section>
+
+        <RelatedContent items={related} />
+      </div>
+
+      <aside class="lg:sticky lg:top-28 lg:self-start">
+        <h2 class="eyebrow text-ink-muted">Ficha técnica</h2>
+
+        <dl class="mt-5 border-t border-border">
+          {
+            specs.map((spec) => (
+              <div class="border-b border-border py-3.5">
+                <dt class="text-sm text-ink-muted">{spec.label}</dt>
+                <dd class="mt-1 font-semibold text-end-900">
+                  {spec.value}
+                  {spec.note && (
+                    <span class="mt-1.5 block text-sm font-normal text-ink-soft">
+                      {spec.note}
+                    </span>
+                  )}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        {
+          categories.length > 0 && (
+            <div class="mt-8">
+              <h2 class="eyebrow text-ink-muted">Categorías</h2>
+              <ul class="mt-4 space-y-2.5">
+                {categories.map((category) => (
+                  <li>
+                    <a
+                      href={`/recursos/categoria/${category.id}/`}
+                      class="group inline-flex items-center gap-2 font-semibold text-end-700"
+                    >
+                      <Icon name={category.data.icon} class="size-4 opacity-70" />
+                      <span class="link-underline">{category.data.name}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
